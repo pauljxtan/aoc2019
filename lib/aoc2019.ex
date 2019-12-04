@@ -6,7 +6,8 @@ defmodule Aoc2019 do
     do: %{
       {1, 1} => Aoc2019.day1_part1_solve(),
       {1, 2} => Aoc2019.day1_part2_solve(),
-      {2, 1} => Aoc2019.day2_part1_solve()
+      {2, 1} => Aoc2019.day2_part1_solve(),
+      {2, 2} => Aoc2019.day2_part2_solve()
     }
 
   def day1_part1_solve(),
@@ -23,6 +24,11 @@ defmodule Aoc2019 do
     do:
       load_delim_input("inputs/input_day2", ",")
       |> day2_part1()
+
+  def day2_part2_solve(),
+    do:
+      load_delim_input("inputs/input_day2", ",")
+      |> day2_part2()
 
   def load_delim_input(filepath, delim),
     do:
@@ -56,6 +62,26 @@ defmodule Aoc2019 do
 
   def day2_part1(program),
     do: program |> List.replace_at(1, 12) |> List.replace_at(2, 2) |> eval_intcode() |> Enum.at(0)
+
+  def day2_part2(program) do
+    # Brute-force all noun-verb pairs: 100*100 = 10000
+    # TODO use stream for lazy eval
+    {noun, verb, _} =
+      for(
+        noun <- 0..99,
+        verb <- 0..99,
+        do:
+          {noun, verb,
+           program
+           |> List.replace_at(1, noun)
+           |> List.replace_at(2, verb)
+           |> eval_intcode()
+           |> Enum.at(0)}
+      )
+      |> Enum.find(fn {_, _, result} -> result == 19_690_720 end)
+
+    100 * noun + verb
+  end
 
   def eval_intcode(program, idx \\ 0) do
     opcode = program |> Enum.at(idx)
