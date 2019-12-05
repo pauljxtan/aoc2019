@@ -27,7 +27,27 @@ defmodule Aoc2019Test do
     assert eval_intcode([1, 1, 1, 4, 99, 5, 6, 0, 99]) == [30, 1, 1, 4, 2, 5, 6, 0, 99]
     assert day2_part1_solve() == 4_138_658
   end
+
   test "day 2, part 2" do
     assert day2_part2_solve() == 7264
+  end
+
+  test "day 3, part 1" do
+    assert parse_path(["R999", "D586", "L462"]) == [R: 999, D: 586, L: 462]
+
+    assert points_on_path(["R1", "D2", "L3", "U2"]) == [
+             {1, 0},
+             {1, -1},
+             {1, -2},
+             {0, -2},
+             {-1, -2},
+             {-2, -2},
+             {-2, -1},
+             {-2, 0}
+           ]
+
+    paths = load_day3()
+    assert closest_intersection(paths) == {181, 376}
+    assert day3_part1_solve() == 557
   end
 end

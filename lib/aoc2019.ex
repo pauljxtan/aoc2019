@@ -7,30 +7,29 @@ defmodule Aoc2019 do
       {1, 1} => Aoc2019.day1_part1_solve(),
       {1, 2} => Aoc2019.day1_part2_solve(),
       {2, 1} => Aoc2019.day2_part1_solve(),
-      {2, 2} => Aoc2019.day2_part2_solve()
+      {2, 2} => Aoc2019.day2_part2_solve(),
+      {3, 1} => Aoc2019.day3_part1_solve()
     }
 
-  def day1_part1_solve(),
-    do:
-      load_delim_input("inputs/input_day1", "\n")
-      |> day1_part1()
+  def day1_part1_solve(), do: load_day1() |> day1_part1()
+  def day1_part2_solve(), do: load_day1() |> day1_part2()
+  def day2_part1_solve(), do: load_day2() |> day2_part1()
+  def day2_part2_solve(), do: load_day2() |> day2_part2()
+  def day3_part1_solve(), do: load_day3() |> day3_part1()
 
-  def day1_part2_solve(),
-    do:
-      load_delim_input("inputs/input_day1", "\n")
-      |> day1_part2()
+  # -- Inputs
 
-  def day2_part1_solve(),
-    do:
-      load_delim_input("inputs/input_day2", ",")
-      |> day2_part1()
+  defp load_day1(), do: load_delim_ints("inputs/input_day1", "\n")
+  defp load_day2(), do: load_delim_ints("inputs/input_day2", ",")
 
-  def day2_part2_solve(),
+  def load_day3(),
     do:
-      load_delim_input("inputs/input_day2", ",")
-      |> day2_part2()
+      File.read!("inputs/input_day3")
+      |> String.split("\n")
+      |> Enum.map(fn path -> path |> String.split(",") end)
+      |> Enum.take(2)
 
-  def load_delim_input(filepath, delim),
+  defp load_delim_ints(filepath, delim),
     do:
       File.read!(filepath)
       |> String.split(delim)
@@ -103,4 +102,44 @@ defmodule Aoc2019 do
         program |> List.replace_at(k, result) |> eval_intcode(idx + 4)
     end
   end
+
+  # -- Day 3
+
+  def day3_part1(paths), do: paths |> closest_intersection() |> manhattan_dist({0, 0})
+
+  def closest_intersection(paths) do
+    [points1, points2] =
+      paths |> Enum.map(&points_on_path/1) |> Enum.map(fn points -> points |> MapSet.new() end)
+
+    # Without loss of generality, take the starting the point to be {0, 0}
+    points1
+    |> MapSet.intersection(points2)
+    |> Enum.min_by(fn point -> point |> manhattan_dist({0, 0}) end)
+  end
+
+  def points_on_path(path) do
+    path
+    |> parse_path()
+    |> Enum.reduce([{0, 0}], fn {direction, steps}, acc ->
+      {x, y} = acc |> List.last()
+
+      acc ++
+        case direction do
+          :R -> 1..steps |> Enum.map(fn n -> {x + n, y} end)
+          :L -> 1..steps |> Enum.map(fn n -> {x - n, y} end)
+          :U -> 1..steps |> Enum.map(fn n -> {x, y + n} end)
+          :D -> 1..steps |> Enum.map(fn n -> {x, y - n} end)
+        end
+    end)
+    |> Enum.drop(1)
+  end
+
+  def parse_path(path),
+    do:
+      path
+      |> Enum.map(fn elem ->
+        {String.to_atom(String.at(elem, 0)), String.to_integer(String.slice(elem, 1..-1))}
+      end)
+
+  def manhattan_dist({x1, y1}, {x2, y2}), do: abs(y2 - y1) + abs(x2 - x1)
 end
