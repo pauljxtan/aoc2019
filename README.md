@@ -2,7 +2,7 @@
 
 My solutions for Advent of Code 2019.
 
-- To display all solutions so far, run `mix sols`
+- To display all solutions so far, run `mix sols` (this will take a while)
 - For a specific solution, run `mix sols [day] [part]` (e.g. `mix sols 1 2`)
 - Run the tests with `mix test`
 
