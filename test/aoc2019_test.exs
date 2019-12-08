@@ -1,7 +1,11 @@
 defmodule Aoc2019Test do
   use ExUnit.Case
   doctest Aoc2019
-  import Aoc2019
+
+  alias Aoc2019.Day1
+  alias Aoc2019.Day2
+  alias Aoc2019.Day3
+  alias Aoc2019.Day4
 
   @day3_path1 [
     ["R75", "D30", "R83", "U83", "L12", "D49", "R71", "U7", "L72"],
@@ -12,49 +16,52 @@ defmodule Aoc2019Test do
     ["U98", "R91", "D20", "R16", "D67", "R40", "U7", "R15", "U6", "R7"]
   ]
 
-  test "day 1, part 1" do
-    assert day1_part1([12]) == 2
-    assert day1_part1([14]) == 2
-    assert day1_part1([1969]) == 654
-    assert day1_part1([100_756]) == 33583
-    assert day1_part1([12, 14, 1969, 100_756]) == 2 + 2 + 654 + 33583
-    # assert day1_part1_solve() == 3_405_721
+  test "day 1" do
+    # Part 1 (non-recursive)
+    assert Day1.total_fuel([12], false) == 2
+    assert Day1.total_fuel([14], false) == 2
+    assert Day1.total_fuel([1969], false) == 654
+    assert Day1.total_fuel([100_756], false) == 33583
+    assert Day1.total_fuel([12, 14, 1969, 100_756], false) == 2 + 2 + 654 + 33583
+
+    # Part 2 (recursive)
+    assert Day1.total_fuel([14], true) == 2
+    assert Day1.total_fuel([1969], true) == 966
+    assert Day1.total_fuel([100_756], true) == 50346
+    assert Day1.total_fuel([14, 1969, 100_756], true) == 2 + 966 + 50346
+
+    assert Day1.solve_part1() == 3_405_721
+    assert Day1.solve_part2() == 5_105_716
   end
 
-  test "day 1, part 2" do
-    assert day1_part2([14]) == 2
-    assert day1_part2([1969]) == 966
-    assert day1_part2([100_756]) == 50346
-    assert day1_part2([14, 1969, 100_756]) == 2 + 966 + 50346
-    # assert day1_part2_solve() == 5_105_716
+  test "day 2" do
+    # Part 1
+    assert Day2.eval_intcode([1, 0, 0, 0, 99]) == [2, 0, 0, 0, 99]
+    assert Day2.eval_intcode([2, 3, 0, 3, 99]) == [2, 3, 0, 6, 99]
+    assert Day2.eval_intcode([2, 4, 4, 5, 99, 0]) == [2, 4, 4, 5, 99, 9801]
+    assert Day2.eval_intcode([1, 1, 1, 4, 99, 5, 6, 0, 99]) == [30, 1, 1, 4, 2, 5, 6, 0, 99]
+
+    assert Day2.solve_part1() == 4_138_658
+    # Too lazy to define a smaller test program, so we'll just test part 2 on the actual input
+    assert Day2.solve_part2() == 7264
   end
 
-  test "day 2, part 1" do
-    assert eval_intcode([1, 0, 0, 0, 99]) == [2, 0, 0, 0, 99]
-    assert eval_intcode([2, 3, 0, 3, 99]) == [2, 3, 0, 6, 99]
-    assert eval_intcode([2, 4, 4, 5, 99, 0]) == [2, 4, 4, 5, 99, 9801]
-    assert eval_intcode([1, 1, 1, 4, 99, 5, 6, 0, 99]) == [30, 1, 1, 4, 2, 5, 6, 0, 99]
-    # assert day2_part1_solve() == 4_138_658
+  test "day 3" do
+    # Part 1
+    assert Day3.closest_intersection_by_dist(@day3_path1) == 159
+    assert Day3.closest_intersection_by_dist(@day3_path2) == 135
+
+    # Part 2
+    assert Day3.closest_intersection_by_steps(@day3_path1) == 610
+    assert Day3.closest_intersection_by_steps(@day3_path2) == 410
+
+    assert Day3.solve_part1() == 557
+    assert Day3.solve_part2() == 56410
   end
 
-  test "day 2, part 2" do
-    assert day2_part2_solve() == 7264
-  end
-
-  test "day 3, part 1" do
-    assert closest_intersection_by_dist(@day3_path1) == 159
-    assert closest_intersection_by_dist(@day3_path2) == 135
-    # assert day3_part1_solve() == 557
-  end
-
-  test "day 3, part 2" do
-    assert closest_intersection_by_steps(@day3_path1) == 610
-    assert closest_intersection_by_steps(@day3_path2) == 410
-    # assert day3_part2_solve() == 56410
-  end
-
-  test "day4, part1" do
-    assert day4_part1_elems(123, 234) == [
+  test "day 4" do
+    # Part 1
+    assert Day4.part1_elems(123, 234) == [
              133,
              144,
              155,
@@ -72,12 +79,11 @@ defmodule Aoc2019Test do
              229,
              233
            ]
-    assert day4_part1(123, 234) == 16
-    #assert day4_part1_solve() == 1099
-  end
 
-  test "day4, part2" do
-    assert day4_part2_elems(123, 234) == [
+    assert Day4.part1(123, 234) == 16
+
+    # Part 2
+    assert Day4.part2_elems(123, 234) == [
              133,
              144,
              155,
@@ -94,7 +100,10 @@ defmodule Aoc2019Test do
              229,
              233
            ]
-    assert day4_part2(123, 234) == 15
-    #assert day4_part2_solve() == 710
+
+    assert Day4.part2(123, 234) == 15
+
+    assert Day4.solve_part1() == 1099
+    assert Day4.solve_part2() == 710
   end
 end
