@@ -1,5 +1,7 @@
 # Aoc2019
 
+![Build status](https://github.com/pauljxtan/aoc2019/workflows/Elixir%20CI/badge.svg)
+
 My solutions for Advent of Code 2019.
 
 - To display all solutions so far, run `mix sols` (this will take a while)
