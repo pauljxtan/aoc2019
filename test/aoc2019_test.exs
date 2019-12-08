@@ -18,7 +18,7 @@ defmodule Aoc2019Test do
     assert day1_part1([1969]) == 654
     assert day1_part1([100_756]) == 33583
     assert day1_part1([12, 14, 1969, 100_756]) == 2 + 2 + 654 + 33583
-    #assert day1_part1_solve() == 3_405_721
+    # assert day1_part1_solve() == 3_405_721
   end
 
   test "day 1, part 2" do
@@ -26,7 +26,7 @@ defmodule Aoc2019Test do
     assert day1_part2([1969]) == 966
     assert day1_part2([100_756]) == 50346
     assert day1_part2([14, 1969, 100_756]) == 2 + 966 + 50346
-    #assert day1_part2_solve() == 5_105_716
+    # assert day1_part2_solve() == 5_105_716
   end
 
   test "day 2, part 1" do
@@ -34,7 +34,7 @@ defmodule Aoc2019Test do
     assert eval_intcode([2, 3, 0, 3, 99]) == [2, 3, 0, 6, 99]
     assert eval_intcode([2, 4, 4, 5, 99, 0]) == [2, 4, 4, 5, 99, 9801]
     assert eval_intcode([1, 1, 1, 4, 99, 5, 6, 0, 99]) == [30, 1, 1, 4, 2, 5, 6, 0, 99]
-    #assert day2_part1_solve() == 4_138_658
+    # assert day2_part1_solve() == 4_138_658
   end
 
   test "day 2, part 2" do
@@ -44,12 +44,57 @@ defmodule Aoc2019Test do
   test "day 3, part 1" do
     assert closest_intersection_by_dist(@day3_path1) == 159
     assert closest_intersection_by_dist(@day3_path2) == 135
-    #assert day3_part1_solve() == 557
+    # assert day3_part1_solve() == 557
   end
 
   test "day 3, part 2" do
     assert closest_intersection_by_steps(@day3_path1) == 610
     assert closest_intersection_by_steps(@day3_path2) == 410
-    #assert day3_part2_solve() == 56410
+    # assert day3_part2_solve() == 56410
+  end
+
+  test "day4, part1" do
+    assert day4_part1_elems(123, 234) == [
+             133,
+             144,
+             155,
+             166,
+             177,
+             188,
+             199,
+             222,
+             223,
+             224,
+             225,
+             226,
+             227,
+             228,
+             229,
+             233
+           ]
+    assert day4_part1(123, 234) == 16
+    #assert day4_part1_solve() == 1099
+  end
+
+  test "day4, part2" do
+    assert day4_part2_elems(123, 234) == [
+             133,
+             144,
+             155,
+             166,
+             177,
+             188,
+             199,
+             223,
+             224,
+             225,
+             226,
+             227,
+             228,
+             229,
+             233
+           ]
+    assert day4_part2(123, 234) == 15
+    #assert day4_part2_solve() == 710
   end
 end

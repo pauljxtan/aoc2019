@@ -9,7 +9,9 @@ defmodule Aoc2019 do
       {2, 1} => Aoc2019.day2_part1_solve(),
       {2, 2} => Aoc2019.day2_part2_solve(),
       {3, 1} => Aoc2019.day3_part1_solve(),
-      {3, 2} => Aoc2019.day3_part2_solve()
+      {3, 2} => Aoc2019.day3_part2_solve(),
+      {4, 1} => Aoc2019.day4_part1_solve(),
+      {4, 2} => Aoc2019.day4_part2_solve()
     }
 
   def day1_part1_solve(), do: load_day1() |> day1_part1()
@@ -18,13 +20,15 @@ defmodule Aoc2019 do
   def day2_part2_solve(), do: load_day2() |> day2_part2()
   def day3_part1_solve(), do: load_day3() |> day3_part1()
   def day3_part2_solve(), do: load_day3() |> day3_part2()
+  def day4_part1_solve(), do: day4_part1(245_182, 790_572)
+  def day4_part2_solve(), do: day4_part2(245_182, 790_572)
 
   # -- Inputs
 
   defp load_day1(), do: load_delim_ints("inputs/input_day1", "\n")
   defp load_day2(), do: load_delim_ints("inputs/input_day2", ",")
 
-  def load_day3(),
+  defp load_day3(),
     do:
       File.read!("inputs/input_day3")
       |> String.split("\n")
@@ -166,4 +170,40 @@ defmodule Aoc2019 do
       end)
 
   defp manhattan_dist({x1, y1}, {x2, y2}), do: abs(y2 - y1) + abs(x2 - x1)
+
+  # -- Day 4
+
+  def day4_part1(min, max), do: day4_part1_elems(min, max) |> length()
+  def day4_part2(min, max), do: day4_part2_elems(min, max) |> length()
+
+  def day4_part1_elems(min, max),
+    do:
+      min..max
+      |> Enum.filter(fn n ->
+        digits = n |> number_to_digits()
+        is_monotonically_increasing(digits) and has_repeated_digit(digits)
+      end)
+
+  def day4_part2_elems(min, max),
+    do:
+      day4_part1_elems(min, max)
+      |> Enum.filter(fn n ->
+        n |> number_to_digits() |> digit_counts() |> Enum.count(&(&1 == 2)) >= 1
+      end)
+
+  def digit_counts(digits),
+    do: digits |> MapSet.new() |> Enum.map(fn d -> digits |> Enum.count(&(&1 == d)) end)
+
+  defp is_monotonically_increasing(digits), do: digits == Enum.sort(digits)
+
+  # N.B. the monotonically increasing condition implies repeated digits must be adjacent
+  defp has_repeated_digit(digits), do: digits |> MapSet.new() |> MapSet.size() < length(digits)
+
+  defp number_to_digits(number),
+    do:
+      number
+      |> Integer.to_string()
+      |> String.split("")
+      |> Enum.reduce([], fn s, acc -> if s != "", do: acc ++ [s], else: acc end)
+      |> Enum.map(&String.to_integer/1)
 end
