@@ -2,10 +2,7 @@ defmodule Aoc2019Test do
   use ExUnit.Case
   doctest Aoc2019
 
-  alias Aoc2019.Day1
-  alias Aoc2019.Day2
-  alias Aoc2019.Day3
-  alias Aoc2019.Day4
+  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5}
 
   @day3_path1 [
     ["R75", "D30", "R83", "U83", "L12", "D49", "R71", "U7", "L72"],
@@ -105,5 +102,15 @@ defmodule Aoc2019Test do
 
     assert Day4.solve_part1() == 1099
     assert Day4.solve_part2() == 710
+  end
+
+  test "day 5" do
+    program = Day5.get_program()
+
+    # Part 1
+    assert program |> Day5.eval_intcode(0, 1, []) == [0, 0, 0, 0, 0, 0, 0, 0, 0, 11_193_703]
+
+    # Part 2
+    assert program |> Day5.eval_intcode(0, 5, []) == [12_410_607]
   end
 end
