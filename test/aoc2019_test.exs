@@ -2,7 +2,7 @@ defmodule Aoc2019Test do
   use ExUnit.Case
   doctest Aoc2019
 
-  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5}
+  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6}
 
   @day3_path1 [
     ["R75", "D30", "R83", "U83", "L12", "D49", "R71", "U7", "L72"],
@@ -112,5 +112,51 @@ defmodule Aoc2019Test do
 
     # Part 2
     assert program |> Day5.eval_intcode(0, 5, []) == [12_410_607]
+  end
+
+  test "day 6" do
+    orbits = [
+      {"COM", "B"},
+      {"B", "C"},
+      {"C", "D"},
+      {"D", "E"},
+      {"E", "F"},
+      {"B", "G"},
+      {"G", "H"},
+      {"D", "I"},
+      {"E", "J"},
+      {"J", "K"},
+      {"K", "L"}
+    ]
+
+    tree = orbits |> Day6.build_tree()
+
+    assert tree == %{
+             "B" => ["C", "G"],
+             "C" => ["D"],
+             "COM" => ["B"],
+             "D" => ["E", "I"],
+             "E" => ["F", "J"],
+             "G" => ["H"],
+             "J" => ["K"],
+             "K" => ["L"]
+           }
+
+    assert tree |> Day6.count_descendants("COM") == 11
+    assert tree |> Day6.count_descendants("B") == 10
+    assert tree |> Day6.count_descendants("G") == 1
+    assert tree |> Day6.count_descendants("H") == 0
+    assert tree |> Day6.count_descendants("C") == 7
+    assert tree |> Day6.count_descendants("D") == 6
+    assert tree |> Day6.count_descendants("I") == 0
+    assert tree |> Day6.count_descendants("E") == 4
+    assert tree |> Day6.count_descendants("J") == 2
+    assert tree |> Day6.count_descendants("K") == 1
+    assert tree |> Day6.count_descendants("L") == 0
+    assert tree |> Day6.count_descendants("F") == 0
+
+    assert tree |> Day6.count_all_descendants() == 42
+
+    assert Day6.solve_part1() == 253_104
   end
 end
