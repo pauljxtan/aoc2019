@@ -2,7 +2,7 @@ defmodule Aoc2019Test do
   use ExUnit.Case
   doctest Aoc2019
 
-  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6}
+  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6, Day7}
 
   @day3_path1 [
     ["R75", "D30", "R83", "U83", "L12", "D49", "R71", "U7", "L72"],
@@ -208,5 +208,29 @@ defmodule Aoc2019Test do
 
     assert Day6.solve_part1() == 253_104
     assert Day6.solve_part2() == 499
+  end
+
+  test "day 7" do
+    # Part 1
+
+    program_1 = [3, 15, 3, 16, 1002, 16, 10, 16, 1, 16, 15, 15, 4, 15, 99, 0, 0]
+
+    program_2 =
+      [3, 23, 3, 24, 1002, 24, 10, 24, 1002, 23, -1, 23, 101, 5, 23, 23, 1, 24, 23, 23, 4, 23] ++
+        [99, 0, 0]
+
+    program_3 =
+      [3, 31, 3, 32, 1002, 32, 10, 32, 1001, 31, -2, 31, 1007, 31, 0, 33, 1002, 33, 7, 33, 1, 33] ++
+        [31, 31, 1, 32, 31, 31, 4, 31, 99, 0, 0, 0]
+
+    assert program_1 |> Day7.compute_amplifiers([4, 3, 2, 1, 0]) == 43210
+    assert program_2 |> Day7.compute_amplifiers([0, 1, 2, 3, 4]) == 54321
+    assert program_3 |> Day7.compute_amplifiers([1, 0, 4, 3, 2]) == 65210
+
+    assert program_1 |> Day7.get_max_signal() == 43210
+    assert program_2 |> Day7.get_max_signal() == 54321
+    assert program_3 |> Day7.get_max_signal() == 65210
+
+    assert Day7.solve_part1() == 437860
   end
 end
