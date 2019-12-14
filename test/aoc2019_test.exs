@@ -115,6 +115,8 @@ defmodule Aoc2019Test do
   end
 
   test "day 6" do
+    # Part 1
+
     orbits = [
       {"COM", "B"},
       {"B", "C"},
@@ -157,6 +159,54 @@ defmodule Aoc2019Test do
 
     assert tree |> Day6.count_all_descendants() == 42
 
+    # Part 2
+
+    orbits = [
+      {"COM", "B"},
+      {"B", "C"},
+      {"C", "D"},
+      {"D", "E"},
+      {"E", "F"},
+      {"B", "G"},
+      {"G", "H"},
+      {"D", "I"},
+      {"E", "J"},
+      {"J", "K"},
+      {"K", "L"},
+      {"K", "YOU"},
+      {"I", "SAN"}
+    ]
+
+    tree = orbits |> Day6.build_tree()
+
+    assert tree == %{
+             "B" => ["C", "G"],
+             "C" => ["D"],
+             "COM" => ["B"],
+             "D" => ["E", "I"],
+             "E" => ["F", "J"],
+             "G" => ["H"],
+             "I" => ["SAN"],
+             "J" => ["K"],
+             "K" => ["L", "YOU"]
+           }
+
+    assert tree |> Day6.get_ancestors("COM") == []
+    assert tree |> Day6.get_ancestors("B") == ["COM"]
+    assert tree |> Day6.get_ancestors("G") == ["B", "COM"]
+    assert tree |> Day6.get_ancestors("H") == ["G", "B", "COM"]
+    assert tree |> Day6.get_ancestors("C") == ["B", "COM"]
+    assert tree |> Day6.get_ancestors("D") == ["C", "B", "COM"]
+    assert tree |> Day6.get_ancestors("I") == ["D", "C", "B", "COM"]
+    assert tree |> Day6.get_ancestors("E") == ["D", "C", "B", "COM"]
+    assert tree |> Day6.get_ancestors("J") == ["E", "D", "C", "B", "COM"]
+    assert tree |> Day6.get_ancestors("K") == ["J", "E", "D", "C", "B", "COM"]
+    assert tree |> Day6.get_ancestors("L") == ["K", "J", "E", "D", "C", "B", "COM"]
+    assert tree |> Day6.get_ancestors("F") == ["E", "D", "C", "B", "COM"]
+
+    assert tree |> Day6.min_orbital_transfers("YOU", "SAN") == 4
+
     assert Day6.solve_part1() == 253_104
+    assert Day6.solve_part2() == 499
   end
 end
