@@ -45,7 +45,6 @@ defmodule Aoc2019.Day7 do
         phases,
         indices \\ [0, 0, 0, 0, 0],
         prev_outputs \\ [0, 0, 0, 0, 0],
-        input \\ 0,
         first \\ true
       )
 
@@ -54,12 +53,15 @@ defmodule Aoc2019.Day7 do
         [phase_A, phase_B, phase_C, phase_D, phase_E],
         [idx_A, idx_B, idx_C, idx_D, idx_E],
         [prev_output_A, prev_output_B, prev_output_C, prev_output_D, prev_output_E],
-        input,
         first
       ) do
     {program_A, output_A, idx_A} =
       case program_A
-           |> eval_intcode_loop(idx_A, if(first, do: [phase_A, input], else: [input]), []) do
+           |> eval_intcode_loop(
+             idx_A,
+             if(first, do: [phase_A, prev_output_E], else: [prev_output_E]),
+             []
+           ) do
         {program_A, output_A, idx_A} -> {program_A, output_A, idx_A}
         :end -> {nil, prev_output_A, nil}
       end
@@ -93,7 +95,6 @@ defmodule Aoc2019.Day7 do
           [phase_A, phase_B, phase_C, phase_D, phase_E],
           [idx_A, idx_B, idx_C, idx_D, idx_E],
           [output_A, output_B, output_C, output_D, output_E],
-          output_E,
           false
         )
 
@@ -102,68 +103,7 @@ defmodule Aoc2019.Day7 do
     end
   end
 
-  defp eval_intcode(program, idx, inputs, outputs) do
-    {opcode, mode1, mode2, mode3} = parse_modevals(program |> Enum.at(idx))
-    params = program |> Enum.slice(idx + 1, 3)
-
-    [i, j, k] =
-      case length(params) do
-        1 -> params ++ [0, 0]
-        2 -> params ++ [0]
-        3 -> params
-      end
-
-    [x, y, _z] =
-      [{i, mode1}, {j, mode2}, {k, mode3}]
-      |> Enum.map(fn {n, m} -> if m == 0, do: program |> Enum.at(n), else: n end)
-
-    case opcode do
-      99 ->
-        [output] = outputs
-        output
-
-      o when o in [1, 2] ->
-        program
-        |> List.replace_at(
-          k,
-          case opcode do
-            1 -> x + y
-            2 -> x * y
-          end
-        )
-        |> eval_intcode(idx + 4, inputs, outputs)
-
-      3 ->
-        [input | inputs_remaining] = inputs
-        program |> List.replace_at(i, input) |> eval_intcode(idx + 2, inputs_remaining, outputs)
-
-      4 ->
-        program |> eval_intcode(idx + 2, inputs, outputs ++ [x])
-
-      o when o in [5, 6] ->
-        if (case o do
-              5 -> x != 0
-              6 -> x == 0
-            end) do
-          program |> eval_intcode(y, inputs, outputs)
-        else
-          program |> eval_intcode(idx + 3, inputs, outputs)
-        end
-
-      o when o in [7, 8] ->
-        if (case o do
-              7 -> x < y
-              8 -> x == y
-            end) do
-          program |> List.replace_at(k, 1) |> eval_intcode(idx + 4, inputs, outputs)
-        else
-          program |> List.replace_at(k, 0) |> eval_intcode(idx + 4, inputs, outputs)
-        end
-    end
-  end
-
-  # Alternate version of intcode computer for feedback loop mode
-  defp eval_intcode_loop(program, idx, inputs, outputs) do
+  defp eval_intcode(program, idx, inputs, outputs, loop_mode \\ false) do
     {opcode, mode1, mode2, mode3} = parse_modevals(program |> Enum.at(idx))
     params = program |> Enum.slice(idx + 1, 3)
 
@@ -181,7 +121,12 @@ defmodule Aoc2019.Day7 do
 
     case opcode do
       99 ->
-        :end
+        if not loop_mode do
+          [output] = outputs
+          output
+        else
+          :end
+        end
 
       o when o in [1, 2] ->
         program
@@ -192,27 +137,31 @@ defmodule Aoc2019.Day7 do
             2 -> x * y
           end
         )
-        |> eval_intcode_loop(idx + 4, inputs, outputs)
+        |> eval_intcode(idx + 4, inputs, outputs, loop_mode)
 
       3 ->
         [input | inputs_remaining] = inputs
-        inputs = if inputs_remaining == [], do: [input], else: inputs_remaining
+        inputs_remaining = if inputs_remaining != [], do: inputs_remaining, else: [input]
 
         program
         |> List.replace_at(i, input)
-        |> eval_intcode_loop(idx + 2, inputs, outputs)
+        |> eval_intcode(idx + 2, inputs_remaining, outputs, loop_mode)
 
       4 ->
-        {program, x, idx + 2}
+        if not loop_mode do
+          program |> eval_intcode(idx + 2, inputs, outputs ++ [x], loop_mode)
+        else
+          {program, x, idx + 2}
+        end
 
       o when o in [5, 6] ->
         if (case o do
               5 -> x != 0
               6 -> x == 0
             end) do
-          program |> eval_intcode_loop(y, inputs, outputs)
+          program |> eval_intcode(y, inputs, outputs, loop_mode)
         else
-          program |> eval_intcode_loop(idx + 3, inputs, outputs)
+          program |> eval_intcode(idx + 3, inputs, outputs, loop_mode)
         end
 
       o when o in [7, 8] ->
@@ -220,12 +169,15 @@ defmodule Aoc2019.Day7 do
               7 -> x < y
               8 -> x == y
             end) do
-          program |> List.replace_at(k, 1) |> eval_intcode_loop(idx + 4, inputs, outputs)
+          program |> List.replace_at(k, 1) |> eval_intcode(idx + 4, inputs, outputs, loop_mode)
         else
-          program |> List.replace_at(k, 0) |> eval_intcode_loop(idx + 4, inputs, outputs)
+          program |> List.replace_at(k, 0) |> eval_intcode(idx + 4, inputs, outputs, loop_mode)
         end
     end
   end
+
+  defp eval_intcode_loop(program, idx, inputs, outputs),
+    do: eval_intcode(program, idx, inputs, outputs, true)
 
   defp parse_modevals(modevals) do
     modevals = modevals |> Integer.to_string() |> String.pad_leading(5, "0")
