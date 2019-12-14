@@ -231,6 +231,28 @@ defmodule Aoc2019Test do
     assert program_2 |> Day7.get_max_signal() == 54321
     assert program_3 |> Day7.get_max_signal() == 65210
 
-    assert Day7.solve_part1() == 437860
+    # Part 2
+
+    program_1 =
+      [3, 26, 1001, 26, -4, 26, 3, 27, 1002, 27, 2, 27, 1, 27, 26, 27, 4, 27, 1001, 28, -1, 28] ++
+        [1005, 28, 6, 99, 0, 0, 5]
+
+    program_2 =
+      [3, 52, 1001, 52, -5, 52, 3, 53, 1, 52, 56, 54, 1007, 54, 5, 55, 1005, 55, 26, 1001, 54] ++
+        [-5, 54, 1105, 1, 12, 1, 53, 54, 53, 1008, 54, 0, 55, 1001, 55, 1, 55, 2, 53, 55, 53, 4] ++
+        [53, 1001, 56, -1, 56, 1005, 56, 6, 99, 0, 0, 0, 0, 10]
+
+    assert program_1
+           |> List.duplicate(5)
+           |> Day7.compute_amplifiers_loop([9, 8, 7, 6, 5]) ==
+             139_629_729
+
+    assert program_2
+           |> List.duplicate(5)
+           |> Day7.compute_amplifiers_loop([9, 7, 8, 5, 6]) ==
+             18216
+
+    assert Day7.solve_part1() == 437_860
+    assert Day7.solve_part2() == 49_810_599
   end
 end
