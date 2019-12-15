@@ -16,5 +16,7 @@ defmodule Mix.Tasks.Sols do
     IO.puts(sol_str(day, part, Aoc2019.solution(day, part)))
   end
 
+  # Too big to display the full image, just hardcode the displayed characters
+  defp sol_str(8, 2, _), do: "LGYHB (run `Aoc2019.Day8.solve_part2()` for the full image)"
   defp sol_str(day, part, sol), do: "Day #{day}, Part #{part}: #{sol}"
 end

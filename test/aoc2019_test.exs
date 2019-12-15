@@ -2,16 +2,7 @@ defmodule Aoc2019Test do
   use ExUnit.Case
   doctest Aoc2019
 
-  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6, Day7}
-
-  @day3_path1 [
-    ["R75", "D30", "R83", "U83", "L12", "D49", "R71", "U7", "L72"],
-    ["U62", "R66", "U55", "R34", "D71", "R55", "D58", "R83"]
-  ]
-  @day3_path2 [
-    ["R98", "U47", "R26", "D63", "R33", "U87", "L62", "D20", "R33", "U53", "R51"],
-    ["U98", "R91", "D20", "R16", "D67", "R40", "U7", "R15", "U6", "R7"]
-  ]
+  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8}
 
   test "day 1" do
     # Part 1 (non-recursive)
@@ -44,13 +35,23 @@ defmodule Aoc2019Test do
   end
 
   test "day 3" do
+    path1 = [
+      ["R75", "D30", "R83", "U83", "L12", "D49", "R71", "U7", "L72"],
+      ["U62", "R66", "U55", "R34", "D71", "R55", "D58", "R83"]
+    ]
+
+    path2 = [
+      ["R98", "U47", "R26", "D63", "R33", "U87", "L62", "D20", "R33", "U53", "R51"],
+      ["U98", "R91", "D20", "R16", "D67", "R40", "U7", "R15", "U6", "R7"]
+    ]
+
     # Part 1
-    assert Day3.closest_intersection_by_dist(@day3_path1) == 159
-    assert Day3.closest_intersection_by_dist(@day3_path2) == 135
+    assert Day3.closest_intersection_by_dist(path1) == 159
+    assert Day3.closest_intersection_by_dist(path2) == 135
 
     # Part 2
-    assert Day3.closest_intersection_by_steps(@day3_path1) == 610
-    assert Day3.closest_intersection_by_steps(@day3_path2) == 410
+    assert Day3.closest_intersection_by_steps(path1) == 610
+    assert Day3.closest_intersection_by_steps(path2) == 410
 
     assert Day3.solve_part1() == 557
     assert Day3.solve_part2() == 56410
@@ -254,5 +255,34 @@ defmodule Aoc2019Test do
 
     assert Day7.solve_part1() == 437_860
     assert Day7.solve_part2() == 49_810_599
+  end
+
+  test "day 8" do
+    # Part 1 - straightforward, don't bother with unit tests
+
+    # Part 2
+
+    layers = [[0, 2, 2, 2], [1, 1, 2, 2], [2, 2, 1, 2], [0, 0, 0, 0]]
+
+    assert layers |> Day8.pixel_layer(0) == [0, 1, 2, 0]
+    assert layers |> Day8.pixel_layer(1) == [2, 1, 2, 0]
+    assert layers |> Day8.pixel_layer(2) == [2, 2, 1, 0]
+    assert layers |> Day8.pixel_layer(3) == [2, 2, 2, 0]
+
+    assert layers |> Day8.pixel_layer(0) |> Day8.colour_of_pixel() == 0
+    assert layers |> Day8.pixel_layer(1) |> Day8.colour_of_pixel() == 1
+    assert layers |> Day8.pixel_layer(2) |> Day8.colour_of_pixel() == 1
+    assert layers |> Day8.pixel_layer(3) |> Day8.colour_of_pixel() == 0
+
+    assert Day8.solve_part1() == 1088
+
+    assert Day8.solve_part2() == [
+             [1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0],
+             [1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0],
+             [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0],
+             [1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0],
+             [1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0],
+             [1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0]
+           ]
   end
 end
