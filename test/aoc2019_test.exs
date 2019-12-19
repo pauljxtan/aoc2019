@@ -2,7 +2,7 @@ defmodule Aoc2019Test do
   use ExUnit.Case
   doctest Aoc2019
 
-  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8}
+  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9}
 
   test "day 1" do
     # Part 1 (non-recursive)
@@ -284,5 +284,25 @@ defmodule Aoc2019Test do
              [1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0],
              [1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0]
            ]
+  end
+
+  # Part 2 takes about a minute to complete
+  @tag timeout: :infinity
+  test "day 9" do
+    # Part 1
+
+    program1 = [109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99]
+    assert program1 |> Day9.eval_intcode_more_mem(0, 1, [], 0) == program1
+
+    program2 = [1102, 34_915_192, 34_915_192, 7, 4, 7, 99, 0]
+    assert program2 |> Day9.eval_intcode_more_mem(0, 1, [], 0) == [1_219_070_632_396_864]
+
+    program3 = [104, 1_125_899_906_842_624, 99]
+    assert program3 |> Day9.eval_intcode_more_mem(0, 1, [], 0) == program3 |> Enum.slice(1, 1)
+
+    # Part 2 - just check final answer
+
+    assert Day9.solve_part1() == 3_989_758_265
+    assert Day9.solve_part2() == 76791
   end
 end
