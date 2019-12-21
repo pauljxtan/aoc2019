@@ -59,45 +59,14 @@ defmodule Aoc2019Test do
 
   test "day 4" do
     # Part 1
-    assert Day4.part1_elems(123, 234) == [
-             133,
-             144,
-             155,
-             166,
-             177,
-             188,
-             199,
-             222,
-             223,
-             224,
-             225,
-             226,
-             227,
-             228,
-             229,
-             233
-           ]
+    assert Day4.part1_elems(123, 234) ==
+             [133, 144, 155, 166, 177, 188, 199, 222, 223, 224, 225, 226, 227, 228, 229, 233]
 
     assert Day4.part1(123, 234) == 16
 
     # Part 2
-    assert Day4.part2_elems(123, 234) == [
-             133,
-             144,
-             155,
-             166,
-             177,
-             188,
-             199,
-             223,
-             224,
-             225,
-             226,
-             227,
-             228,
-             229,
-             233
-           ]
+    assert Day4.part2_elems(123, 234) ==
+             [133, 144, 155, 166, 177, 188, 199, 223, 224, 225, 226, 227, 228, 229, 233]
 
     assert Day4.part2(123, 234) == 15
 
@@ -118,19 +87,9 @@ defmodule Aoc2019Test do
   test "day 6" do
     # Part 1
 
-    orbits = [
-      {"COM", "B"},
-      {"B", "C"},
-      {"C", "D"},
-      {"D", "E"},
-      {"E", "F"},
-      {"B", "G"},
-      {"G", "H"},
-      {"D", "I"},
-      {"E", "J"},
-      {"J", "K"},
-      {"K", "L"}
-    ]
+    orbits =
+      [{"COM", "B"}, {"B", "C"}, {"C", "D"}, {"D", "E"}, {"E", "F"}, {"B", "G"}, {"G", "H"}] ++
+        [{"D", "I"}, {"E", "J"}, {"J", "K"}, {"K", "L"}]
 
     tree = orbits |> Day6.build_tree()
 
@@ -360,19 +319,6 @@ defmodule Aoc2019Test do
       "#.#.#.#####.####.###",
       "###.##.####.##.#..##"
     ]
-
-    # Tests for v1 method
-    # assert Day10.blocking_coords({3, 4}, {1, 0}) == [{2, 2}]
-    # assert Day10.blocking_coords({3, 4}, {4, 0}) == []
-    # assert Day10.blocking_coords({0, 2}, {6, 8}) == [{1, 3}, {2, 4}, {3, 5}, {4, 6}, {5, 7}]
-    # assert Day10.blocking_coords({0, 2}, {6, 14}) == [{1, 4}, {2, 6}, {3, 8}, {4, 10}, {5, 12}]
-    # assert Day10.blocking_coords({0, 2}, {12, 8}) == [{2, 3}, {4, 4}, {6, 5}, {8, 6}, {10, 7}]
-    # assert Day10.blocking_coords({0, 2}, {8, 14}) == [{2, 5}, {4, 8}, {6, 11}]
-    # assert Day10.blocking_coords({0, 2}, {12, 10}) == [{3, 4}, {6, 6}, {9, 8}]
-    # assert {3, 4} |> Day10.detectable_asteroids(asteroids) ==
-    # [{0, 2}, {1, 2}, {2, 2}, {3, 2}, {4, 0}, {4, 2}, {4, 3}, {4, 4}]
-    # assert {4, 3} |> Day10.detectable_asteroids(asteroids) ==
-    # [{0, 2}, {1, 2}, {2, 2}, {3, 2}, {3, 4}, {4, 2}, {4, 4}]
 
     asteroids1 = map1 |> Day10.parse_asteroids()
 

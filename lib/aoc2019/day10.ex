@@ -7,7 +7,8 @@ defmodule Aoc2019.Day10 do
   def solve_part2() do
     {station_coord, _} = input_map() |> parse_asteroids() |> best_location()
 
-    input_map() |> parse_asteroids()
+    input_map()
+    |> parse_asteroids()
     |> vaporization_order(station_coord)
     |> Enum.at(199)
     |> (fn {x, y} -> x * 100 + y end).()
@@ -88,39 +89,4 @@ defmodule Aoc2019.Day10 do
 
   defp angle({x1, y1}, {x2, y2}), do: :math.atan2(y2 - y1, x2 - x1)
   defp dist({x1, y1}, {x2, y2}), do: :math.sqrt(:math.pow(y2 - y1, 2) + :math.pow(x2 - x1, 2))
-
-  # ----------------------------------------------------------------------------------------------
-  # The code below was my first attempt using line equations
-  # For larger maps (e.g. the final example and real input) the results were off by a few
-  # asteroids, and I haven't been able to figure out why
-
-  # defp count_detectable(source, asteroids),
-  # do: source |> detectable_asteroids(asteroids) |> length()
-
-  # defp detectable_asteroids(source, asteroids),
-  # do:
-  # asteroids
-  # |> Enum.filter(&(&1 != source))
-  # |> Enum.filter(fn candidate ->
-  # source
-  # |> blocking_coords(candidate)
-  # |> Enum.all?(fn blocker -> blocker not in asteroids end)
-  # end)
-
-  ## Vertical (infinite slope)
-  # defp blocking_coords({x, y1}, {x, y2}), do: domain(y1, y2) |> Enum.map(fn y -> {x, y} end)
-
-  # defp blocking_coords({x1, y1}, {x2, y2}) do
-  # m = (y2 - y1) / (x2 - x1)
-  # b = y1 - m * x1
-
-  # domain(x1, x2)
-  # |> Enum.map(fn x -> {x, m * x + b} end)
-  # |> Enum.filter(fn {x, y} -> round(x) == x and round(y) == y end)
-  # |> Enum.map(fn {x, y} -> {round(x), round(y)} end)
-  # end
-
-  # defp domain(x1, x2) when abs(x1 - x2) <= 1, do: []
-  # defp domain(x1, x2) when x1 < x2, do: (x1 + 1)..(x2 - 1)
-  # defp domain(x1, x2), do: (x2 + 1)..(x1 - 1)
 end

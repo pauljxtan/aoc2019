@@ -28,8 +28,11 @@ defmodule Aoc2019.Day8 do
   def decode_image(data, width, height) do
     layers = data |> parse_layers(width, height)
 
-    (for position <- 0..(width * height - 1),
-      do: layers |> pixel_layer(position) |> colour_of_pixel()) |> Enum.chunk_every(width)
+    for(
+      position <- 0..(width * height - 1),
+      do: layers |> pixel_layer(position) |> colour_of_pixel()
+    )
+    |> Enum.chunk_every(width)
   end
 
   def pixel_layer(layers, position),
