@@ -2,7 +2,7 @@ defmodule Aoc2019Test do
   use ExUnit.Case
   doctest Aoc2019
 
-  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9}
+  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10}
 
   test "day 1" do
     # Part 1 (non-recursive)
@@ -162,21 +162,9 @@ defmodule Aoc2019Test do
 
     # Part 2
 
-    orbits = [
-      {"COM", "B"},
-      {"B", "C"},
-      {"C", "D"},
-      {"D", "E"},
-      {"E", "F"},
-      {"B", "G"},
-      {"G", "H"},
-      {"D", "I"},
-      {"E", "J"},
-      {"J", "K"},
-      {"K", "L"},
-      {"K", "YOU"},
-      {"I", "SAN"}
-    ]
+    orbits =
+      [{"COM", "B"}, {"B", "C"}, {"C", "D"}, {"D", "E"}, {"E", "F"}, {"B", "G"}, {"G", "H"}] ++
+        [{"D", "I"}, {"E", "J"}, {"J", "K"}, {"K", "L"}, {"K", "YOU"}, {"I", "SAN"}]
 
     tree = orbits |> Day6.build_tree()
 
@@ -304,5 +292,134 @@ defmodule Aoc2019Test do
 
     assert Day9.solve_part1() == 3_989_758_265
     assert Day9.solve_part2() == 76791
+  end
+
+  test "day 10" do
+    # Part 1
+
+    map1 = [".#..#", ".....", "#####", "....#", "...##"]
+
+    map2 = [
+      "......#.#.",
+      "#..#.#....",
+      "..#######.",
+      ".#.#.###..",
+      ".#..#.....",
+      "..#....#.#",
+      "#..#....#.",
+      ".##.#..###",
+      "##...#..#.",
+      ".#....####"
+    ]
+
+    map3 = [
+      "#.#...#.#.",
+      ".###....#.",
+      ".#....#...",
+      "##.#.#.#.#",
+      "....#.#.#.",
+      ".##..###.#",
+      "..#...##..",
+      "..##....##",
+      "......#...",
+      ".####.###."
+    ]
+
+    map4 = [
+      ".#..#..###",
+      "####.###.#",
+      "....###.#.",
+      "..###.##.#",
+      "##.##.#.#.",
+      "....###..#",
+      "..#.#..#.#",
+      "#..#.#.###",
+      ".##...##.#",
+      ".....#.#.."
+    ]
+
+    map5 = [
+      ".#..##.###...#######",
+      "##.############..##.",
+      ".#.######.########.#",
+      ".###.#######.####.#.",
+      "#####.##.#.##.###.##",
+      "..#####..#.#########",
+      "####################",
+      "#.####....###.#.#.##",
+      "##.#################",
+      "#####.##.###..####..",
+      "..######..##.#######",
+      "####.##.####...##..#",
+      ".#####..#.######.###",
+      "##...#.##########...",
+      "#.##########.#######",
+      ".####.#.###.###.#.##",
+      "....##.##.###..#####",
+      ".#.#.###########.###",
+      "#.#.#.#####.####.###",
+      "###.##.####.##.#..##"
+    ]
+
+    # Tests for v1 method
+    # assert Day10.blocking_coords({3, 4}, {1, 0}) == [{2, 2}]
+    # assert Day10.blocking_coords({3, 4}, {4, 0}) == []
+    # assert Day10.blocking_coords({0, 2}, {6, 8}) == [{1, 3}, {2, 4}, {3, 5}, {4, 6}, {5, 7}]
+    # assert Day10.blocking_coords({0, 2}, {6, 14}) == [{1, 4}, {2, 6}, {3, 8}, {4, 10}, {5, 12}]
+    # assert Day10.blocking_coords({0, 2}, {12, 8}) == [{2, 3}, {4, 4}, {6, 5}, {8, 6}, {10, 7}]
+    # assert Day10.blocking_coords({0, 2}, {8, 14}) == [{2, 5}, {4, 8}, {6, 11}]
+    # assert Day10.blocking_coords({0, 2}, {12, 10}) == [{3, 4}, {6, 6}, {9, 8}]
+    # assert {3, 4} |> Day10.detectable_asteroids(asteroids) ==
+    # [{0, 2}, {1, 2}, {2, 2}, {3, 2}, {4, 0}, {4, 2}, {4, 3}, {4, 4}]
+    # assert {4, 3} |> Day10.detectable_asteroids(asteroids) ==
+    # [{0, 2}, {1, 2}, {2, 2}, {3, 2}, {3, 4}, {4, 2}, {4, 4}]
+
+    asteroids1 = map1 |> Day10.parse_asteroids()
+
+    assert asteroids1 ==
+             [{0, 2}, {1, 0}, {1, 2}, {2, 2}, {3, 2}, {3, 4}, {4, 0}, {4, 2}, {4, 3}, {4, 4}]
+
+    assert asteroids1 |> Day10.count_detectable_v2({1, 0}) == 7
+    assert asteroids1 |> Day10.count_detectable_v2({4, 0}) == 7
+    assert asteroids1 |> Day10.count_detectable_v2({0, 2}) == 6
+    assert asteroids1 |> Day10.count_detectable_v2({1, 2}) == 7
+    assert asteroids1 |> Day10.count_detectable_v2({2, 2}) == 7
+    assert asteroids1 |> Day10.count_detectable_v2({3, 2}) == 7
+    assert asteroids1 |> Day10.count_detectable_v2({4, 2}) == 5
+    assert asteroids1 |> Day10.count_detectable_v2({4, 3}) == 7
+    assert asteroids1 |> Day10.count_detectable_v2({3, 4}) == 8
+    assert asteroids1 |> Day10.count_detectable_v2({4, 4}) == 7
+
+    assert map1 |> Day10.parse_asteroids() |> Day10.best_location() == {{3, 4}, 8}
+    assert map2 |> Day10.parse_asteroids() |> Day10.best_location() == {{5, 8}, 33}
+    assert map3 |> Day10.parse_asteroids() |> Day10.best_location() == {{1, 2}, 35}
+    assert map4 |> Day10.parse_asteroids() |> Day10.best_location() == {{6, 3}, 41}
+    assert map5 |> Day10.parse_asteroids() |> Day10.best_location() == {{11, 13}, 210}
+
+    # Part 2
+
+    assert asteroids1 |> Day10.group_by_angle({4, 2}) == [
+             {-1.5707963267948966, [{4, 0}]},
+             {1.5707963267948966, [{4, 3}, {4, 4}]},
+             {2.0344439357957027, [{3, 4}]},
+             {3.141592653589793, [{3, 2}, {2, 2}, {1, 2}, {0, 2}]},
+             {3.7295952571373605, [{1, 0}]}
+           ]
+
+    vapor_order5 = map5 |> Day10.parse_asteroids() |> Day10.vaporization_order({11, 13})
+    assert vapor_order5 |> Enum.at(0) == {11, 12}
+    assert vapor_order5 |> Enum.at(1) == {12, 1}
+    assert vapor_order5 |> Enum.at(2) == {12, 2}
+    assert vapor_order5 |> Enum.at(9) == {12, 8}
+    assert vapor_order5 |> Enum.at(19) == {16, 0}
+    assert vapor_order5 |> Enum.at(49) == {16, 9}
+    assert vapor_order5 |> Enum.at(99) == {10, 16}
+    assert vapor_order5 |> Enum.at(198) == {9, 6}
+    assert vapor_order5 |> Enum.at(199) == {8, 2}
+    assert vapor_order5 |> Enum.at(200) == {10, 9}
+    assert vapor_order5 |> Enum.at(298) == {11, 1}
+
+    assert Day10.solve_part1() == 299
+    assert Day10.solve_part2() == 1419
   end
 end
