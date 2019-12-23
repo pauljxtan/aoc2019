@@ -22,7 +22,9 @@ defmodule Aoc2019 do
     {9, 1} => &Aoc2019.Day9.solve_part1/0,
     {9, 2} => &Aoc2019.Day9.solve_part2/0,
     {10, 1} => &Aoc2019.Day10.solve_part1/0,
-    {10, 2} => &Aoc2019.Day10.solve_part2/0
+    {10, 2} => &Aoc2019.Day10.solve_part2/0,
+    {11, 1} => &Aoc2019.Day11.solve_part1/0,
+    {11, 2} => &Aoc2019.Day11.solve_part2/0
   }
 
   def implemented(), do: @solver_lookup |> Map.keys()

@@ -2,7 +2,7 @@ defmodule Aoc2019Test do
   use ExUnit.Case
   doctest Aoc2019
 
-  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10}
+  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11}
 
   test "day 1" do
     # Part 1 (non-recursive)
@@ -367,5 +367,38 @@ defmodule Aoc2019Test do
 
     assert Day10.solve_part1() == 299
     assert Day10.solve_part2() == 1419
+  end
+
+  test "day 11" do
+    # No smaller test programs provided, so just test on the full thing
+    assert Day11.solve_part1() == 1732
+
+    # Part 2
+
+    test_panels = %{
+      {-1, -1} => :black,
+      {-1, 0} => :white,
+      {-1, 2} => :black,
+      {0, -1} => :white,
+      {0, 0} => :white,
+      {0, 1} => :black,
+      {1, -1} => :black,
+      {1, 0} => :white,
+      {1, 1} => :white,
+      {1, 2} => :white,
+      {2, -1} => :black,
+      {2, 1} => :black,
+    }
+
+    assert test_panels |> Day11.format_str() == [".#..", "###.", "..#.", "..#."]
+
+    assert Day11.solve_part2() == [
+             "..##..###...##..#....####.#..#.#..#...##...",
+             ".#..#.#..#.#..#.#....#....#..#.#..#....#...",
+             ".#..#.###..#....#....###..#..#.####....#...",
+             ".####.#..#.#....#....#....#..#.#..#....#...",
+             ".#..#.#..#.#..#.#....#....#..#.#..#.#..#...",
+             ".#..#.###...##..####.#.....##..#..#..##...."
+           ]
   end
 end
