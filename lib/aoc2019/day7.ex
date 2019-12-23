@@ -29,11 +29,11 @@ defmodule Aoc2019.Day7 do
       |> Enum.max()
 
   def compute_amplifiers(program, [phase_A, phase_B, phase_C, phase_D, phase_E]) do
-    [output_A] = program |> eval_intcode(0, [phase_A, 0], [], 0, false)
-    [output_B] = program |> eval_intcode(0, [phase_B, output_A], [], 0, false)
-    [output_C] = program |> eval_intcode(0, [phase_C, output_B], [], 0, false)
-    [output_D] = program |> eval_intcode(0, [phase_D, output_C], [], 0, false)
-    [output_E] = program |> eval_intcode(0, [phase_E, output_D], [], 0, false)
+    [output_A] = program |> eval_intcode(0, [phase_A, 0], [], false)
+    [output_B] = program |> eval_intcode(0, [phase_B, output_A], [],  false)
+    [output_C] = program |> eval_intcode(0, [phase_C, output_B], [],  false)
+    [output_D] = program |> eval_intcode(0, [phase_D, output_C], [],  false)
+    [output_E] = program |> eval_intcode(0, [phase_E, output_D], [],  false)
     output_E
   end
 
@@ -58,7 +58,7 @@ defmodule Aoc2019.Day7 do
 
     # TODO try to refactor this to use the helper too
     case program_E
-         |> eval_intcode(idx_E, if(first, do: [phase_E, output_D], else: [output_D]), [], 0, true) do
+         |> eval_intcode(idx_E, if(first, do: [phase_E, output_D], else: [output_D]), [], true) do
       {program_E, output_E, idx_E} ->
         [program_A, program_B, program_C, program_D, program_E]
         |> compute_amplifiers_loop(
@@ -79,7 +79,6 @@ defmodule Aoc2019.Day7 do
            idx,
            if(first, do: [phase, input], else: [input]),
            [],
-           0,
            true
          ) do
       {program, output, idx} -> {program, output, idx}
