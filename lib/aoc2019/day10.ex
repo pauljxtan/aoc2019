@@ -14,7 +14,7 @@ defmodule Aoc2019.Day10 do
     |> (fn {x, y} -> x * 100 + y end).()
   end
 
-  def input_map(),
+  defp input_map(),
     do:
       File.read!("inputs/input_day10")
       |> String.split("\n")
@@ -23,7 +23,7 @@ defmodule Aoc2019.Day10 do
   def best_location(asteroids),
     do:
       asteroids
-      |> Enum.map(fn source -> {source, asteroids |> count_detectable_v2(source)} end)
+      |> Enum.map(fn source -> {source, asteroids |> count_detectable(source)} end)
       |> Enum.max_by(fn {_, detectable} -> detectable end)
 
   def vaporization_order(asteroids, station_coord),
@@ -62,7 +62,7 @@ defmodule Aoc2019.Day10 do
       |> Enum.sort()
 
   # This method counts unique angles b/w the source and other asteroids
-  def count_detectable_v2(asteroids, source),
+  def count_detectable(asteroids, source),
     do:
       asteroids
       |> Enum.filter(&(&1 != source))

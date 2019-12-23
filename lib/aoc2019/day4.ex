@@ -22,7 +22,7 @@ defmodule Aoc2019.Day4 do
         n |> number_to_digits() |> digit_counts() |> Enum.count(&(&1 == 2)) >= 1
       end)
 
-  def digit_counts(digits),
+  defp digit_counts(digits),
     do: digits |> MapSet.new() |> Enum.map(fn d -> digits |> Enum.count(&(&1 == d)) end)
 
   defp is_monotonically_increasing(digits), do: digits == Enum.sort(digits)

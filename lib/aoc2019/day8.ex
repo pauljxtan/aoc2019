@@ -21,11 +21,11 @@ defmodule Aoc2019.Day8 do
 
   def solve_part2(), do: image_data() |> decode_image(@input_width, @input_height)
 
-  def image_data(), do: load_delim_ints("inputs/input_day8", "")
+  defp image_data(), do: load_delim_ints("inputs/input_day8", "")
 
-  def parse_layers(data, width, height), do: data |> Enum.chunk_every(width * height)
+  defp parse_layers(data, width, height), do: data |> Enum.chunk_every(width * height)
 
-  def decode_image(data, width, height) do
+  defp decode_image(data, width, height) do
     layers = data |> parse_layers(width, height)
 
     for(

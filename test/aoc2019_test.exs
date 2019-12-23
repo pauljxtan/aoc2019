@@ -3,6 +3,7 @@ defmodule Aoc2019Test do
   doctest Aoc2019
 
   alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11}
+  alias Intcode
 
   test "day 1" do
     # Part 1 (non-recursive)
@@ -24,10 +25,10 @@ defmodule Aoc2019Test do
 
   test "day 2" do
     # Part 1
-    assert Day2.eval_intcode([1, 0, 0, 0, 99]) == [2, 0, 0, 0, 99]
-    assert Day2.eval_intcode([2, 3, 0, 3, 99]) == [2, 3, 0, 6, 99]
-    assert Day2.eval_intcode([2, 4, 4, 5, 99, 0]) == [2, 4, 4, 5, 99, 9801]
-    assert Day2.eval_intcode([1, 1, 1, 4, 99, 5, 6, 0, 99]) == [30, 1, 1, 4, 2, 5, 6, 0, 99]
+    assert Intcode.eval_intcode([1, 0, 0, 0, 99]) == [2, 0, 0, 0, 99]
+    assert Intcode.eval_intcode([2, 3, 0, 3, 99]) == [2, 3, 0, 6, 99]
+    assert Intcode.eval_intcode([2, 4, 4, 5, 99, 0]) == [2, 4, 4, 5, 99, 9801]
+    assert Intcode.eval_intcode([1, 1, 1, 4, 99, 5, 6, 0, 99]) == [30, 1, 1, 4, 2, 5, 6, 0, 99]
 
     assert Day2.solve_part1() == 4_138_658
     # Too lazy to define a smaller test program, so we'll just test part 2 on the actual input
@@ -78,10 +79,10 @@ defmodule Aoc2019Test do
     program = Day5.get_program()
 
     # Part 1
-    assert program |> Day5.eval_intcode(0, 1, []) == [0, 0, 0, 0, 0, 0, 0, 0, 0, 11_193_703]
+    assert program |> Intcode.eval_intcode(0, 1, []) == [0, 0, 0, 0, 0, 0, 0, 0, 0, 11_193_703]
 
     # Part 2
-    assert program |> Day5.eval_intcode(0, 5, []) == [12_410_607]
+    assert program |> Intcode.eval_intcode(0, 5, []) == [12_410_607]
   end
 
   test "day 6" do
@@ -205,8 +206,6 @@ defmodule Aoc2019Test do
   end
 
   test "day 8" do
-    # Part 1 - straightforward, don't bother with unit tests
-
     # Part 2
 
     layers = [[0, 2, 2, 2], [1, 1, 2, 2], [2, 2, 1, 2], [0, 0, 0, 0]]
@@ -236,18 +235,20 @@ defmodule Aoc2019Test do
   # Part 2 takes about a minute to complete
   @tag timeout: :infinity
   test "day 9" do
-    # Part 1
+    assert [1, 2, 3] |> Intcode.add_memory(3) == [1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-    program1 = [109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99]
-    assert program1 |> Day9.eval_intcode_more_mem(0, 1, [], 0) == program1
+    assert [109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99]
+           |> Intcode.add_memory(10)
+           |> Intcode.eval_intcode(0, 1, [], 0, :outputs) ==
+             [109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99]
 
-    program2 = [1102, 34_915_192, 34_915_192, 7, 4, 7, 99, 0]
-    assert program2 |> Day9.eval_intcode_more_mem(0, 1, [], 0) == [1_219_070_632_396_864]
+    assert [1102, 34_915_192, 34_915_192, 7, 4, 7, 99, 0]
+           |> Intcode.add_memory(10)
+           |> Intcode.eval_intcode(0, 1, [], 0, :outputs) == [1_219_070_632_396_864]
 
-    program3 = [104, 1_125_899_906_842_624, 99]
-    assert program3 |> Day9.eval_intcode_more_mem(0, 1, [], 0) == program3 |> Enum.slice(1, 1)
-
-    # Part 2 - just check final answer
+    assert [104, 1_125_899_906_842_624, 99]
+           |> Intcode.add_memory(10)
+           |> Intcode.eval_intcode(0, 1, [], 0, :outputs) == [1_125_899_906_842_624]
 
     assert Day9.solve_part1() == 3_989_758_265
     assert Day9.solve_part2() == 76791
@@ -325,16 +326,16 @@ defmodule Aoc2019Test do
     assert asteroids1 ==
              [{0, 2}, {1, 0}, {1, 2}, {2, 2}, {3, 2}, {3, 4}, {4, 0}, {4, 2}, {4, 3}, {4, 4}]
 
-    assert asteroids1 |> Day10.count_detectable_v2({1, 0}) == 7
-    assert asteroids1 |> Day10.count_detectable_v2({4, 0}) == 7
-    assert asteroids1 |> Day10.count_detectable_v2({0, 2}) == 6
-    assert asteroids1 |> Day10.count_detectable_v2({1, 2}) == 7
-    assert asteroids1 |> Day10.count_detectable_v2({2, 2}) == 7
-    assert asteroids1 |> Day10.count_detectable_v2({3, 2}) == 7
-    assert asteroids1 |> Day10.count_detectable_v2({4, 2}) == 5
-    assert asteroids1 |> Day10.count_detectable_v2({4, 3}) == 7
-    assert asteroids1 |> Day10.count_detectable_v2({3, 4}) == 8
-    assert asteroids1 |> Day10.count_detectable_v2({4, 4}) == 7
+    assert asteroids1 |> Day10.count_detectable({1, 0}) == 7
+    assert asteroids1 |> Day10.count_detectable({4, 0}) == 7
+    assert asteroids1 |> Day10.count_detectable({0, 2}) == 6
+    assert asteroids1 |> Day10.count_detectable({1, 2}) == 7
+    assert asteroids1 |> Day10.count_detectable({2, 2}) == 7
+    assert asteroids1 |> Day10.count_detectable({3, 2}) == 7
+    assert asteroids1 |> Day10.count_detectable({4, 2}) == 5
+    assert asteroids1 |> Day10.count_detectable({4, 3}) == 7
+    assert asteroids1 |> Day10.count_detectable({3, 4}) == 8
+    assert asteroids1 |> Day10.count_detectable({4, 4}) == 7
 
     assert map1 |> Day10.parse_asteroids() |> Day10.best_location() == {{3, 4}, 8}
     assert map2 |> Day10.parse_asteroids() |> Day10.best_location() == {{5, 8}, 33}
@@ -370,7 +371,6 @@ defmodule Aoc2019Test do
   end
 
   test "day 11" do
-    # No smaller test programs provided, so just test on the full thing
     assert Day11.solve_part1() == 1732
 
     # Part 2
@@ -387,7 +387,7 @@ defmodule Aoc2019Test do
       {1, 1} => :white,
       {1, 2} => :white,
       {2, -1} => :black,
-      {2, 1} => :black,
+      {2, 1} => :black
     }
 
     assert test_panels |> Day11.format_str() == [".#..", "###.", "..#.", "..#."]

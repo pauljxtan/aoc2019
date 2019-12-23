@@ -16,7 +16,7 @@ defmodule Aoc2019.Day7 do
       |> Enum.map(fn phase_seq -> program |> compute_amplifiers(phase_seq) end)
       |> Enum.max()
 
-  def get_max_signal_loop(program),
+  defp get_max_signal_loop(program),
     do:
       [5, 6, 7, 8, 9]
       |> permutations()
@@ -27,11 +27,6 @@ defmodule Aoc2019.Day7 do
       end)
       |> Enum.max()
 
-  defp permutations([]), do: [[]]
-
-  defp permutations(xs),
-    do: for(x <- xs, remaining <- permutations(xs -- [x]), do: [x | remaining])
-
   def compute_amplifiers(program, [phase_A, phase_B, phase_C, phase_D, phase_E]) do
     output_A = program |> eval_intcode(0, [phase_A, 0], [])
     output_B = program |> eval_intcode(0, [phase_B, output_A], [])
@@ -41,51 +36,23 @@ defmodule Aoc2019.Day7 do
   end
 
   def compute_amplifiers_loop(
-        programs,
-        phases,
-        indices \\ [0, 0, 0, 0, 0],
-        prev_outputs \\ [0, 0, 0, 0, 0],
-        first \\ true
-      )
-
-  def compute_amplifiers_loop(
         [program_A, program_B, program_C, program_D, program_E],
         [phase_A, phase_B, phase_C, phase_D, phase_E],
-        [idx_A, idx_B, idx_C, idx_D, idx_E],
-        [prev_output_A, prev_output_B, prev_output_C, prev_output_D, prev_output_E],
-        first
+        [idx_A, idx_B, idx_C, idx_D, idx_E] \\ [0, 0, 0, 0, 0],
+        [prev_out_A, prev_out_B, prev_out_C, prev_out_D, prev_out_E] \\ [0, 0, 0, 0, 0],
+        first \\ true
       ) do
     {program_A, output_A, idx_A} =
-      case program_A
-           |> eval_intcode_loop(
-             idx_A,
-             if(first, do: [phase_A, prev_output_E], else: [prev_output_E]),
-             []
-           ) do
-        {program_A, output_A, idx_A} -> {program_A, output_A, idx_A}
-        :end -> {nil, prev_output_A, nil}
-      end
+      compute_amplifiers_loop_helper(program_A, idx_A, first, phase_A, prev_out_E, prev_out_A)
 
     {program_B, output_B, idx_B} =
-      case program_B
-           |> eval_intcode_loop(idx_B, if(first, do: [phase_B, output_A], else: [output_A]), []) do
-        {program_B, output_B, idx_B} -> {program_B, output_B, idx_B}
-        :end -> {nil, prev_output_B, nil}
-      end
+      compute_amplifiers_loop_helper(program_B, idx_B, first, phase_B, output_A, prev_out_B)
 
     {program_C, output_C, idx_C} =
-      case program_C
-           |> eval_intcode_loop(idx_C, if(first, do: [phase_C, output_B], else: [output_B]), []) do
-        {program_C, output_C, idx_C} -> {program_C, output_C, idx_C}
-        :end -> {nil, prev_output_C, nil}
-      end
+      compute_amplifiers_loop_helper(program_C, idx_C, first, phase_C, output_B, prev_out_C)
 
     {program_D, output_D, idx_D} =
-      case program_D
-           |> eval_intcode_loop(idx_D, if(first, do: [phase_D, output_C], else: [output_C]), []) do
-        {program_D, output_D, idx_D} -> {program_D, output_D, idx_D}
-        :end -> {nil, prev_output_D, nil}
-      end
+      compute_amplifiers_loop_helper(program_D, idx_D, first, phase_D, output_C, prev_out_D)
 
     case program_E
          |> eval_intcode_loop(idx_E, if(first, do: [phase_E, output_D], else: [output_D]), []) do
@@ -99,7 +66,19 @@ defmodule Aoc2019.Day7 do
         )
 
       :end ->
-        prev_output_E
+        prev_out_E
+    end
+  end
+
+  defp compute_amplifiers_loop_helper(program, idx, first, phase, input, prev_out) do
+    case program
+         |> eval_intcode_loop(
+           idx,
+           if(first, do: [phase, input], else: [input]),
+           []
+         ) do
+      {program, output, idx} -> {program, output, idx}
+      :end -> {nil, prev_out, nil}
     end
   end
 

@@ -4,7 +4,7 @@ defmodule Aoc2019.Day6 do
   def solve_part1(), do: get_orbits() |> build_tree() |> count_all_descendants()
   def solve_part2(), do: get_orbits() |> build_tree() |> min_orbital_transfers("YOU", "SAN")
 
-  def get_orbits(),
+  defp get_orbits(),
     do:
       File.read!("inputs/input_day6")
       |> String.split("\n")

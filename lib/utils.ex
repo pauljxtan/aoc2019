@@ -11,4 +11,9 @@ defmodule Utils do
             :error -> []
           end
       end)
+
+  def permutations([]), do: [[]]
+
+  def permutations(xs),
+    do: for(x <- xs, remaining <- permutations(xs -- [x]), do: [x | remaining])
 end

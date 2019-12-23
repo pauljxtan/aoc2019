@@ -1,5 +1,6 @@
 defmodule Aoc2019.Day2 do
   import Utils
+  import Intcode
 
   @behaviour DaySolution
 
@@ -29,26 +30,5 @@ defmodule Aoc2019.Day2 do
       |> Enum.find(fn {_, _, result} -> result == target end)
 
     100 * noun + verb
-  end
-
-  def eval_intcode(program, idx \\ 0) do
-    opcode = program |> Enum.at(idx)
-
-    case opcode do
-      99 ->
-        program
-
-      _ ->
-        [i, j, k] = program |> Enum.slice(idx + 1, 3)
-        [x, y] = [i, j] |> Enum.map(fn k -> program |> Enum.at(k) end)
-
-        result =
-          case opcode do
-            1 -> x + y
-            2 -> x * y
-          end
-
-        program |> List.replace_at(k, result) |> eval_intcode(idx + 4)
-    end
   end
 end
