@@ -239,16 +239,16 @@ defmodule Aoc2019Test do
 
     assert [109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99]
            |> Intcode.add_memory(10)
-           |> Intcode.eval_intcode(0, 1, [], 0, :outputs) ==
+           |> Intcode.eval_intcode(0, 1, [], 0) ==
              [109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99]
 
     assert [1102, 34_915_192, 34_915_192, 7, 4, 7, 99, 0]
            |> Intcode.add_memory(10)
-           |> Intcode.eval_intcode(0, 1, [], 0, :outputs) == [1_219_070_632_396_864]
+           |> Intcode.eval_intcode(0, 1, [], 0) == [1_219_070_632_396_864]
 
     assert [104, 1_125_899_906_842_624, 99]
            |> Intcode.add_memory(10)
-           |> Intcode.eval_intcode(0, 1, [], 0, :outputs) == [1_125_899_906_842_624]
+           |> Intcode.eval_intcode(0, 1, [], 0) == [1_125_899_906_842_624]
 
     assert Day9.solve_part1() == 3_989_758_265
     assert Day9.solve_part2() == 76791
