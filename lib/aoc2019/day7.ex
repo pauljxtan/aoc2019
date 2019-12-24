@@ -26,11 +26,11 @@ defmodule Aoc2019.Day7 do
       |> Enum.max()
 
   def compute_amplifiers(program, [phase_A, phase_B, phase_C, phase_D, phase_E]) do
-    [output_A] = program |> Intcode.eval(%IntcodeParams{idx: 0, inputs: [phase_A, 0]})
-    [output_B] = program |> Intcode.eval(%IntcodeParams{idx: 0, inputs: [phase_B, output_A]})
-    [output_C] = program |> Intcode.eval(%IntcodeParams{idx: 0, inputs: [phase_C, output_B]})
-    [output_D] = program |> Intcode.eval(%IntcodeParams{idx: 0, inputs: [phase_D, output_C]})
-    [output_E] = program |> Intcode.eval(%IntcodeParams{idx: 0, inputs: [phase_E, output_D]})
+    [output_A] = program |> Intcode.eval(%IntcodeParams{inputs: [phase_A, 0]})
+    [output_B] = program |> Intcode.eval(%IntcodeParams{inputs: [phase_B, output_A]})
+    [output_C] = program |> Intcode.eval(%IntcodeParams{inputs: [phase_C, output_B]})
+    [output_D] = program |> Intcode.eval(%IntcodeParams{inputs: [phase_D, output_C]})
+    [output_E] = program |> Intcode.eval(%IntcodeParams{inputs: [phase_E, output_D]})
     output_E
   end
 
@@ -42,24 +42,22 @@ defmodule Aoc2019.Day7 do
         first \\ true
       ) do
     {program_A, output_A, idx_A} =
-      compute_amplifiers_loop_helper(program_A, idx_A, first, phase_A, prev_out_E, prev_out_A)
+      program_A |> compute_amplifiers_loop_helper(idx_A, first, phase_A, prev_out_E, prev_out_A)
 
     {program_B, output_B, idx_B} =
-      compute_amplifiers_loop_helper(program_B, idx_B, first, phase_B, output_A, prev_out_B)
+      program_B |> compute_amplifiers_loop_helper(idx_B, first, phase_B, output_A, prev_out_B)
 
     {program_C, output_C, idx_C} =
-      compute_amplifiers_loop_helper(program_C, idx_C, first, phase_C, output_B, prev_out_C)
+      program_C |> compute_amplifiers_loop_helper(idx_C, first, phase_C, output_B, prev_out_C)
 
     {program_D, output_D, idx_D} =
-      compute_amplifiers_loop_helper(program_D, idx_D, first, phase_D, output_C, prev_out_D)
+      program_D |> compute_amplifiers_loop_helper(idx_D, first, phase_D, output_C, prev_out_D)
 
-    # TODO try to refactor this to use the helper too
     case program_E
-         |> Intcode.eval(%IntcodeParams{
-           idx: idx_E,
-           inputs: if(first, do: [phase_E, output_D], else: [output_D]),
-           loop_mode: true
-         }) do
+         |> compute_amplifiers_loop_helper(idx_E, first, phase_E, output_D, prev_out_E) do
+      {nil, prev_out, nil} ->
+        prev_out
+
       {program_E, output_E, idx_E} ->
         [program_A, program_B, program_C, program_D, program_E]
         |> compute_amplifiers_loop(
@@ -68,9 +66,6 @@ defmodule Aoc2019.Day7 do
           [output_A, output_B, output_C, output_D, output_E],
           false
         )
-
-      :end ->
-        prev_out_E
     end
   end
 

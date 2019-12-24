@@ -2,87 +2,20 @@ defmodule Intcode do
   def add_memory(program, multiplier),
     do: program ++ List.duplicate(0, length(program) * multiplier)
 
-  # Day 2
-  # def eval_intcode(program),
-  # do: eval_intcode(program, 0, [0], [], false, 0, {false, nil, nil, nil}, :program)
-  # do: eval(program, %IntcodeParams{return_val: :program})
-
-  # Day 5
-  # def eval_intcode(program, idx, input, outputs),
-  # do: eval_intcode(program, idx, [input], outputs, false, 0, {false, nil, nil, nil}, :outputs)
-
-  # Day 7
-  def eval_intcode(program, idx, inputs, outputs, loop_mode),
-    do:
-      eval_intcode(program, idx, inputs, outputs, loop_mode, 0, {false, nil, nil, nil}, :outputs)
-
-  # Day 9
-  def eval_intcode(program, idx, input, outputs, loop_mode, rel_base),
-    do:
-      eval_intcode(
-        program,
-        idx,
-        [input],
-        outputs,
-        loop_mode,
-        rel_base,
-        {false, nil, nil, nil},
-        :outputs
-      )
-
-  # Day 11
-  def eval_intcode(
-        program,
-        idx,
-        input,
-        outputs,
-        loop_mode,
-        rel_base,
-        {robot_position, robot_direction, robot_panels}
-      ),
-      do:
-        eval_intcode(
-          program,
-          idx,
-          [input],
-          outputs,
-          loop_mode,
-          rel_base,
-          {true, robot_position, robot_direction, robot_panels},
-          :outputs
-        )
-
   def eval(program, params) do
-    # TODO refactor this
-    %IntcodeParams{
-      idx: idx,
-      inputs: inputs,
-      outputs: outputs,
-      loop_mode: loop_mode,
-      rel_base: rel_base,
-      return_val: return_val,
-      robot_mode: robot_mode,
-      robot_position: robot_position,
-      robot_direction: robot_direction,
-      robot_panels: robot_panels
-    } = params
+    params =
+      if params.robot_mode and length(params.outputs) == 2,
+        do: do_robot_action(params),
+        else: params
 
-    {robot_position, robot_direction, robot_panels, inputs, outputs} =
-      if robot_mode and length(outputs) == 2,
-        do: do_robot_action(robot_position, robot_direction, robot_panels, outputs),
-        else: {robot_position, robot_direction, robot_panels, inputs, outputs}
+    [opcode: opcode, mode1: mode1, mode2: mode2, mode3: mode3] =
+      program
+      |> Enum.at(params.idx)
+      |> Integer.to_string()
+      |> String.pad_leading(5, "0")
+      |> parse_modevals()
 
-    params = %{
-      params
-      | robot_position: robot_position,
-        robot_direction: robot_direction,
-        robot_panels: robot_panels,
-        inputs: inputs,
-        outputs: outputs
-    }
-
-    {opcode, mode1, mode2, mode3} = parse_modevals(program |> Enum.at(idx))
-    pars = program |> Enum.slice(idx + 1, 3)
+    pars = program |> Enum.slice(params.idx + 1, 3)
 
     [i, j, k] =
       case length(pars) do
@@ -98,27 +31,27 @@ defmodule Intcode do
         case mode do
           0 -> program |> Enum.at(h)
           1 -> h
-          2 -> program |> Enum.at(rel_base + h)
+          2 -> program |> Enum.at(params.rel_base + h)
         end
       end)
 
     # NOTE this part is not entirely clear in the description
-    i = if mode1 == 2, do: rel_base + i, else: i
-    k = if mode3 == 2, do: rel_base + k, else: k
+    i = if mode1 == 2, do: params.rel_base + i, else: i
+    k = if mode3 == 2, do: params.rel_base + k, else: k
 
     case opcode do
       99 ->
         cond do
-          robot_mode ->
-            robot_panels
+          params.robot_mode ->
+            params.robot_panels
 
-          loop_mode ->
+          params.loop_mode ->
             :end
 
           true ->
-            case return_val do
+            case params.return_val do
               :program -> program
-              :outputs -> outputs
+              :outputs -> params.outputs
             end
         end
 
@@ -131,22 +64,21 @@ defmodule Intcode do
             2 -> x * y
           end
         )
-        |> eval(%{params | idx: idx + 4})
+        |> eval(%{params | idx: params.idx + 4})
 
       3 ->
         # Use all inputs once until the last input, which is then used for the rest of the program
         # We can think of this as a stream with the last element repeated infinitely
-        [input | rest] = inputs
-        inputs = if rest != [], do: rest, else: [input]
+        [input | rest] = params.inputs
 
         program
         |> List.replace_at(i, input)
-        |> eval(%{params | idx: idx + 2, inputs: inputs})
+        |> eval(%{params | idx: params.idx + 2, inputs: if(rest != [], do: rest, else: [input])})
 
       4 ->
-        if loop_mode,
-          do: {program, x, idx + 2},
-          else: program |> eval(%{params | idx: idx + 2, outputs: outputs ++ [x]})
+        if params.loop_mode,
+          do: {program, x, params.idx + 2},
+          else: program |> eval(%{params | idx: params.idx + 2, outputs: params.outputs ++ [x]})
 
       o when o in [5, 6] ->
         if (case o do
@@ -154,234 +86,54 @@ defmodule Intcode do
               6 -> x == 0
             end),
            do: program |> eval(%{params | idx: y}),
-           else: program |> eval(%{params | idx: idx + 3})
+           else: program |> eval(%{params | idx: params.idx + 3})
 
       o when o in [7, 8] ->
         if (case o do
               7 -> x < y
               8 -> x == y
             end),
-           do: program |> List.replace_at(k, 1) |> eval(%{params | idx: idx + 4}),
-           else: program |> List.replace_at(k, 0) |> eval(%{params | idx: idx + 4})
+           do: program |> List.replace_at(k, 1) |> eval(%{params | idx: params.idx + 4}),
+           else: program |> List.replace_at(k, 0) |> eval(%{params | idx: params.idx + 4})
 
       9 ->
         program
-        |> eval(%{params | idx: idx + 2, rel_base: rel_base + x})
+        |> eval(%{params | idx: params.idx + 2, rel_base: params.rel_base + x})
     end
   end
 
-  defp eval_intcode(
-         program,
-         idx,
-         inputs,
-         outputs,
-         loop_mode,
-         rel_base,
-         {robot_mode, robot_position, robot_direction, robot_panels},
-         return_val
-       ) do
-    {robot_position, robot_direction, robot_panels, inputs, outputs} =
-      if robot_mode and length(outputs) == 2,
-        do: do_robot_action(robot_position, robot_direction, robot_panels, outputs),
-        else: {robot_position, robot_direction, robot_panels, inputs, outputs}
-
-    {opcode, mode1, mode2, mode3} = parse_modevals(program |> Enum.at(idx))
-    params = program |> Enum.slice(idx + 1, 3)
-
-    [i, j, k] =
-      case length(params) do
-        0 -> [0, 0, 0]
-        1 -> params ++ [0, 0]
-        2 -> params ++ [0]
-        3 -> params
-      end
-
-    [x, y, _z] =
-      [{i, mode1}, {j, mode2}, {k, mode3}]
-      |> Enum.map(fn {h, mode} ->
-        case mode do
-          0 -> program |> Enum.at(h)
-          1 -> h
-          2 -> program |> Enum.at(rel_base + h)
-        end
-      end)
-
-    # NOTE this part is not entirely clear in the description
-    i = if mode1 == 2, do: rel_base + i, else: i
-    k = if mode3 == 2, do: rel_base + k, else: k
-
-    case opcode do
-      99 ->
-        cond do
-          robot_mode ->
-            robot_panels
-
-          loop_mode ->
-            :end
-
-          true ->
-            case return_val do
-              :program -> program
-              :outputs -> outputs
-            end
-        end
-
-      o when o in [1, 2] ->
-        program
-        |> List.replace_at(
-          k,
-          case opcode do
-            1 -> x + y
-            2 -> x * y
-          end
+  defp parse_modevals(modevals),
+    do:
+      [opcode: modevals |> String.slice(-2..-1) |> String.to_integer()]
+      |> Keyword.merge(
+        [:mode1, :mode2, :mode3]
+        |> Enum.zip(
+          -3..-5
+          |> Enum.map(fn i -> modevals |> String.at(i) |> String.to_integer() end)
         )
-        |> eval_intcode(
-          idx + 4,
-          inputs,
-          outputs,
-          loop_mode,
-          rel_base,
-          {robot_mode, robot_position, robot_direction, robot_panels},
-          return_val
-        )
+      )
 
-      3 ->
-        # Use all inputs once until the last input, which is then used for the rest of the program
-        # We can think of this as a stream with the last element repeated infinitely
-        [input | rest] = inputs
-        inputs = if rest != [], do: rest, else: [input]
-
-        program
-        |> List.replace_at(i, input)
-        |> eval_intcode(
-          idx + 2,
-          inputs,
-          outputs,
-          loop_mode,
-          rel_base,
-          {robot_mode, robot_position, robot_direction, robot_panels},
-          return_val
-        )
-
-      4 ->
-        if loop_mode,
-          do: {program, x, idx + 2},
-          else:
-            program
-            |> eval_intcode(
-              idx + 2,
-              inputs,
-              outputs ++ [x],
-              loop_mode,
-              rel_base,
-              {robot_mode, robot_position, robot_direction, robot_panels},
-              return_val
-            )
-
-      o when o in [5, 6] ->
-        if (case o do
-              5 -> x != 0
-              6 -> x == 0
-            end),
-           do:
-             program
-             |> eval_intcode(
-               y,
-               inputs,
-               outputs,
-               loop_mode,
-               rel_base,
-               {robot_mode, robot_position, robot_direction, robot_panels},
-               return_val
-             ),
-           else:
-             program
-             |> eval_intcode(
-               idx + 3,
-               inputs,
-               outputs,
-               loop_mode,
-               rel_base,
-               {robot_mode, robot_position, robot_direction, robot_panels},
-               return_val
-             )
-
-      o when o in [7, 8] ->
-        if (case o do
-              7 -> x < y
-              8 -> x == y
-            end),
-           do:
-             program
-             |> List.replace_at(k, 1)
-             |> eval_intcode(
-               idx + 4,
-               inputs,
-               outputs,
-               loop_mode,
-               rel_base,
-               {robot_mode, robot_position, robot_direction, robot_panels},
-               return_val
-             ),
-           else:
-             program
-             |> List.replace_at(k, 0)
-             |> eval_intcode(
-               idx + 4,
-               inputs,
-               outputs,
-               loop_mode,
-               rel_base,
-               {robot_mode, robot_position, robot_direction, robot_panels},
-               return_val
-             )
-
-      9 ->
-        program
-        |> eval_intcode(
-          idx + 2,
-          inputs,
-          outputs,
-          loop_mode,
-          rel_base + x,
-          {robot_mode, robot_position, robot_direction, robot_panels},
-          return_val
-        )
-    end
-  end
-
-  defp parse_modevals(modevals) do
-    modevals = modevals |> Integer.to_string() |> String.pad_leading(5, "0")
-    opcode = modevals |> String.slice(-2..-1) |> String.to_integer()
-
-    [mode1, mode2, mode3] =
-      -3..-5 |> Enum.map(fn i -> modevals |> String.at(i) |> String.to_integer() end)
-
-    {opcode, mode1, mode2, mode3}
-  end
-
-  defp do_robot_action(position, direction, panels, outputs) do
-    colour =
-      case outputs |> Enum.at(-2) do
-        0 -> :black
-        1 -> :white
-      end
-
-    turn =
-      case outputs |> Enum.at(-1) do
-        0 -> :ccw
-        1 -> :cw
-      end
-
+  defp do_robot_action(params) do
     # Paint the current panel
     # Any panel that is a key in this map has been painted at least once
-    panels = panels |> Map.put(position, colour)
+    updated_panels =
+      params.robot_panels
+      |> Map.put(
+        params.robot_position,
+        case params.outputs |> Enum.at(-2) do
+          0 -> :black
+          1 -> :white
+        end
+      )
 
     # Turn the robot
     next_direction =
-      case turn do
+      case (case params.outputs |> Enum.at(-1) do
+              0 -> :ccw
+              1 -> :cw
+            end) do
         :ccw ->
-          case direction do
+          case params.robot_direction do
             :up -> :left
             :left -> :down
             :down -> :right
@@ -389,7 +141,7 @@ defmodule Intcode do
           end
 
         :cw ->
-          case direction do
+          case params.robot_direction do
             :up -> :right
             :right -> :down
             :down -> :left
@@ -397,7 +149,7 @@ defmodule Intcode do
           end
       end
 
-    {x, y} = position
+    {x, y} = params.robot_position
 
     # Move forward one panel
     next_position =
@@ -408,14 +160,20 @@ defmodule Intcode do
         :right -> {x + 1, y}
       end
 
-    next_colour = panels |> Map.get(next_position, :black)
+    next_colour = updated_panels |> Map.get(next_position, :black)
 
-    input =
-      case next_colour do
-        :black -> 0
-        :white -> 1
-      end
-
-    {next_position, next_direction, panels, [input], []}
+    %{
+      params
+      | robot_position: next_position,
+        robot_direction: next_direction,
+        robot_panels: updated_panels,
+        inputs: [
+          case next_colour do
+            :black -> 0
+            :white -> 1
+          end
+        ],
+        outputs: []
+    }
   end
 end
