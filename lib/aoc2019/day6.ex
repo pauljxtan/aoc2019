@@ -23,21 +23,34 @@ defmodule Aoc2019.Day6 do
     do:
       tree
       |> Map.keys()
-      |> Enum.map(fn parent -> tree |> count_descendants(parent) end)
-      |> Enum.sum()
+      # Memoize
+      |> Enum.reduce({%{}, 0}, fn parent, {cache, total} ->
+        {count, cache} = tree |> count_descendants(parent, cache)
+        {cache, total + count}
+      end)
+      |> (fn {_cache, total} -> total end).()
 
-  def count_descendants(tree, parent),
-    do:
-      if(parent not in Map.keys(tree),
-        do: 0,
-        else:
-          tree
-          |> Map.get(parent)
-          |> Enum.map(fn child -> 1 + count_descendants(tree, child) end)
-          |> Enum.sum()
-      )
+  def count_descendants(tree, parent, cache \\ %{}) do
+    case cache |> Map.get(parent, nil) do
+      nil ->
+        if parent not in Map.keys(tree)  do
+          {0, cache}
+        else
+          count =
+            tree
+            |> Map.get(parent)
+            |> Enum.map(fn child ->
+              {child_count, cache} = count_descendants(tree, child, cache)
+              1 + child_count
+            end)
+            |> Enum.sum()
 
-  # TODO should probably use some dynamic programming for listing ancestors
+          {count, cache |> Map.put(parent, count)}
+        end
+      count -> {count, cache}
+    end
+  end
+
   def min_orbital_transfers(tree, node1, node2) do
     [node1_ancestors, node2_ancestors] =
       [node1, node2] |> Enum.map(fn node -> tree |> get_ancestors(node) end)

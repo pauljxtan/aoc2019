@@ -105,18 +105,18 @@ defmodule Aoc2019Test do
              "K" => ["L"]
            }
 
-    assert tree |> Day6.count_descendants("COM") == 11
-    assert tree |> Day6.count_descendants("B") == 10
-    assert tree |> Day6.count_descendants("G") == 1
-    assert tree |> Day6.count_descendants("H") == 0
-    assert tree |> Day6.count_descendants("C") == 7
-    assert tree |> Day6.count_descendants("D") == 6
-    assert tree |> Day6.count_descendants("I") == 0
-    assert tree |> Day6.count_descendants("E") == 4
-    assert tree |> Day6.count_descendants("J") == 2
-    assert tree |> Day6.count_descendants("K") == 1
-    assert tree |> Day6.count_descendants("L") == 0
-    assert tree |> Day6.count_descendants("F") == 0
+    assert tree |> Day6.count_descendants("COM") |> (fn {count, _cache} -> count end).() == 11
+    assert tree |> Day6.count_descendants("B")   |> (fn {count, _cache} -> count end).() == 10
+    assert tree |> Day6.count_descendants("G")   |> (fn {count, _cache} -> count end).() == 1
+    assert tree |> Day6.count_descendants("H")   |> (fn {count, _cache} -> count end).() == 0
+    assert tree |> Day6.count_descendants("C")   |> (fn {count, _cache} -> count end).() == 7
+    assert tree |> Day6.count_descendants("D")   |> (fn {count, _cache} -> count end).() == 6
+    assert tree |> Day6.count_descendants("I")   |> (fn {count, _cache} -> count end).() == 0
+    assert tree |> Day6.count_descendants("E")   |> (fn {count, _cache} -> count end).() == 4
+    assert tree |> Day6.count_descendants("J")   |> (fn {count, _cache} -> count end).() == 2
+    assert tree |> Day6.count_descendants("K")   |> (fn {count, _cache} -> count end).() == 1
+    assert tree |> Day6.count_descendants("L")   |> (fn {count, _cache} -> count end).() == 0
+    assert tree |> Day6.count_descendants("F")   |> (fn {count, _cache} -> count end).() == 0
 
     assert tree |> Day6.count_all_descendants() == 42
 
