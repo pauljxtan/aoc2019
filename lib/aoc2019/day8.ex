@@ -1,6 +1,4 @@
 defmodule Aoc2019.Day8 do
-  import Utils
-
   @behaviour DaySolution
 
   @input_width 25
@@ -21,7 +19,7 @@ defmodule Aoc2019.Day8 do
 
   def solve_part2(), do: image_data() |> decode_image(@input_width, @input_height)
 
-  defp image_data(), do: load_delim_ints("inputs/input_day8", "")
+  defp image_data(), do: Utils.load_delim_ints("inputs/input_day8", "")
 
   defp parse_layers(data, width, height), do: data |> Enum.chunk_every(width * height)
 

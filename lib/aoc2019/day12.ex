@@ -1,6 +1,4 @@
 defmodule Aoc2019.Day12 do
-  import Utils
-
   @behaviour DaySolution
 
   def solve_part1() do
@@ -27,7 +25,7 @@ defmodule Aoc2019.Day12 do
     do:
       [:x, :y, :z]
       |> Enum.map(fn dimension -> {positions, velocities} |> get_period_dim(dimension) end)
-      |> lowest_common_multiple()
+      |> Utils.lowest_common_multiple()
 
   defp get_period_dim({positions_init, velocities_init}, dimension),
     do:

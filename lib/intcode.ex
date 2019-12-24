@@ -3,12 +3,13 @@ defmodule Intcode do
     do: program ++ List.duplicate(0, length(program) * multiplier)
 
   # Day 2
-  def eval_intcode(program),
-    do: eval_intcode(program, 0, [0], [], false, 0, {false, nil, nil, nil}, :program)
+  #def eval_intcode(program),
+    # do: eval_intcode(program, 0, [0], [], false, 0, {false, nil, nil, nil}, :program)
+    #do: eval(program, %IntcodeParams{return_val: :program})
 
   # Day 5
-  def eval_intcode(program, idx, input, outputs),
-    do: eval_intcode(program, idx, [input], outputs, false, 0, {false, nil, nil, nil}, :outputs)
+  #def eval_intcode(program, idx, input, outputs),
+    #do: eval_intcode(program, idx, [input], outputs, false, 0, {false, nil, nil, nil}, :outputs)
 
   # Day 7
   def eval_intcode(program, idx, inputs, outputs, loop_mode),
@@ -50,6 +51,124 @@ defmodule Intcode do
           {true, robot_position, robot_direction, robot_panels},
           :outputs
         )
+
+  def eval(program, params) do
+    # TODO refactor this
+    %IntcodeParams{
+      idx: idx,
+      inputs: inputs,
+      outputs: outputs,
+      loop_mode: loop_mode,
+      rel_base: rel_base,
+      return_val: return_val,
+      robot_mode: robot_mode,
+      robot_position: robot_position,
+      robot_direction: robot_direction,
+      robot_panels: robot_panels
+    } = params
+
+    {robot_position, robot_direction, robot_panels, inputs, outputs} =
+      if robot_mode and length(outputs) == 2,
+        do: do_robot_action(robot_position, robot_direction, robot_panels, outputs),
+        else: {robot_position, robot_direction, robot_panels, inputs, outputs}
+
+    params = %{
+      params
+      | robot_position: robot_position,
+        robot_direction: robot_direction,
+        robot_panels: robot_panels,
+        inputs: inputs,
+        outputs: outputs
+    }
+
+    {opcode, mode1, mode2, mode3} = parse_modevals(program |> Enum.at(idx))
+    pars = program |> Enum.slice(idx + 1, 3)
+
+    [i, j, k] =
+      case length(pars) do
+        0 -> [0, 0, 0]
+        1 -> pars ++ [0, 0]
+        2 -> pars ++ [0]
+        3 -> pars
+      end
+
+    [x, y, _z] =
+      [{i, mode1}, {j, mode2}, {k, mode3}]
+      |> Enum.map(fn {h, mode} ->
+        case mode do
+          0 -> program |> Enum.at(h)
+          1 -> h
+          2 -> program |> Enum.at(rel_base + h)
+        end
+      end)
+
+    # NOTE this part is not entirely clear in the description
+    i = if mode1 == 2, do: rel_base + i, else: i
+    k = if mode3 == 2, do: rel_base + k, else: k
+
+    case opcode do
+      99 ->
+        cond do
+          robot_mode ->
+            robot_panels
+
+          loop_mode ->
+            :end
+
+          true ->
+            case return_val do
+              :program -> program
+              :outputs -> outputs
+            end
+        end
+
+      o when o in [1, 2] ->
+        program
+        |> List.replace_at(
+          k,
+          case opcode do
+            1 -> x + y
+            2 -> x * y
+          end
+        )
+        |> eval(%{params | idx: idx + 4})
+
+      3 ->
+        # Use all inputs once until the last input, which is then used for the rest of the program
+        # We can think of this as a stream with the last element repeated infinitely
+        [input | rest] = inputs
+        inputs = if rest != [], do: rest, else: [input]
+
+        program
+        |> List.replace_at(i, input)
+        |> eval(%{params | idx: idx + 2, inputs: inputs})
+
+      4 ->
+        if loop_mode,
+          do: {program, x, idx + 2},
+          else: program |> eval(%{params | idx: idx + 2, outputs: outputs ++ [x]})
+
+      o when o in [5, 6] ->
+        if (case o do
+              5 -> x != 0
+              6 -> x == 0
+            end),
+           do: program |> eval(%{params | idx: y}),
+           else: program |> eval(%{params | idx: idx + 3})
+
+      o when o in [7, 8] ->
+        if (case o do
+              7 -> x < y
+              8 -> x == y
+            end),
+           do: program |> List.replace_at(k, 1) |> eval(%{params | idx: idx + 4}),
+           else: program |> List.replace_at(k, 0) |> eval(%{params | idx: idx + 4})
+
+      9 ->
+        program
+        |> eval(%{params | idx: idx + 2, rel_base: rel_base + x})
+    end
+  end
 
   defp eval_intcode(
          program,

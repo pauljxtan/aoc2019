@@ -1,12 +1,10 @@
 defmodule Aoc2019.Day1 do
-  import Utils
-
   @behaviour DaySolution
 
   def solve_part1(), do: modules() |> total_fuel(false)
   def solve_part2(), do: modules() |> total_fuel(true)
 
-  defp modules(), do: load_delim_ints("inputs/input_day1", "\n")
+  defp modules(), do: Utils.load_delim_ints("inputs/input_day1", "\n")
 
   def total_fuel(masses, recursive \\ false),
     do:

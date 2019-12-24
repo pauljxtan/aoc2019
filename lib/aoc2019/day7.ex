@@ -1,26 +1,23 @@
 defmodule Aoc2019.Day7 do
-  import Utils
-  import Intcode
-
   @behaviour DaySolution
 
   def solve_part1(), do: get_program() |> get_max_signal()
   def solve_part2(), do: get_program() |> get_max_signal_loop()
 
-  defp get_program(), do: load_delim_ints("inputs/input_day7", ",")
+  defp get_program(), do: Utils.load_delim_ints("inputs/input_day7", ",")
 
   def get_max_signal(program),
     # Number of permutations = 5! = 120
     do:
       [0, 1, 2, 3, 4]
-      |> permutations()
+      |> Utils.permutations()
       |> Enum.map(fn phase_seq -> program |> compute_amplifiers(phase_seq) end)
       |> Enum.max()
 
   defp get_max_signal_loop(program),
     do:
       [5, 6, 7, 8, 9]
-      |> permutations()
+      |> Utils.permutations()
       |> Enum.map(fn phase_seq ->
         program
         |> List.duplicate(5)
@@ -29,11 +26,11 @@ defmodule Aoc2019.Day7 do
       |> Enum.max()
 
   def compute_amplifiers(program, [phase_A, phase_B, phase_C, phase_D, phase_E]) do
-    [output_A] = program |> eval_intcode(0, [phase_A, 0], [], false)
-    [output_B] = program |> eval_intcode(0, [phase_B, output_A], [],  false)
-    [output_C] = program |> eval_intcode(0, [phase_C, output_B], [],  false)
-    [output_D] = program |> eval_intcode(0, [phase_D, output_C], [],  false)
-    [output_E] = program |> eval_intcode(0, [phase_E, output_D], [],  false)
+    [output_A] = program |> Intcode.eval(%IntcodeParams{idx: 0, inputs: [phase_A, 0]})
+    [output_B] = program |> Intcode.eval(%IntcodeParams{idx: 0, inputs: [phase_B, output_A]})
+    [output_C] = program |> Intcode.eval(%IntcodeParams{idx: 0, inputs: [phase_C, output_B]})
+    [output_D] = program |> Intcode.eval(%IntcodeParams{idx: 0, inputs: [phase_D, output_C]})
+    [output_E] = program |> Intcode.eval(%IntcodeParams{idx: 0, inputs: [phase_E, output_D]})
     output_E
   end
 
@@ -58,7 +55,11 @@ defmodule Aoc2019.Day7 do
 
     # TODO try to refactor this to use the helper too
     case program_E
-         |> eval_intcode(idx_E, if(first, do: [phase_E, output_D], else: [output_D]), [], true) do
+         |> Intcode.eval(%IntcodeParams{
+           idx: idx_E,
+           inputs: if(first, do: [phase_E, output_D], else: [output_D]),
+           loop_mode: true
+         }) do
       {program_E, output_E, idx_E} ->
         [program_A, program_B, program_C, program_D, program_E]
         |> compute_amplifiers_loop(
@@ -75,12 +76,11 @@ defmodule Aoc2019.Day7 do
 
   defp compute_amplifiers_loop_helper(program, idx, first, phase, input, prev_out) do
     case program
-         |> eval_intcode(
-           idx,
-           if(first, do: [phase, input], else: [input]),
-           [],
-           true
-         ) do
+         |> Intcode.eval(%IntcodeParams{
+           idx: idx,
+           inputs: if(first, do: [phase, input], else: [input]),
+           loop_mode: true
+         }) do
       {program, output, idx} -> {program, output, idx}
       :end -> {nil, prev_out, nil}
     end
