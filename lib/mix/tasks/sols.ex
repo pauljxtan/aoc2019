@@ -12,26 +12,27 @@ defmodule Mix.Tasks.Sols do
     end
   end
 
-  defp do_sol(day, part), do:
-    IO.puts(
-      sol_str(
-        day,
-        part,
-        case {day, part} do
-          {8, 2} ->
-            "LGYHB (run `Aoc2019.Day8.solve_part2()` for the full image)"
+  defp do_sol(day, part),
+    do:
+      IO.puts(
+        sol_str(
+          day,
+          part,
+          case {day, part} do
+            {8, 2} ->
+              "LGYHB (run `Aoc2019.Day8.solve_part2()` for the full image)"
 
-          {9, 2} ->
-            "76791 (hard-coded here until I optimize this properly)"
+            {9, 2} ->
+              "76791 (hard-coded here until I optimize this properly)"
 
-          {11, 2} ->
-            "Day 11, Part 2: ABCLFUHJ  (run `Aoc2019.Day11.solve_part2()` for the full image)"
+            {11, 2} ->
+              "Day 11, Part 2: ABCLFUHJ  (run `Aoc2019.Day11.solve_part2()` for the full image)"
 
-          {day, part} ->
-            Aoc2019.solution(day, part)
-        end
+            {day, part} ->
+              Aoc2019.solution(day, part)
+          end
+        )
       )
-    )
 
   defp sol_str(day, part, sol), do: "Day #{day}, Part #{part}: #{sol}"
 end

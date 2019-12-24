@@ -3,13 +3,13 @@ defmodule Intcode do
     do: program ++ List.duplicate(0, length(program) * multiplier)
 
   # Day 2
-  #def eval_intcode(program),
-    # do: eval_intcode(program, 0, [0], [], false, 0, {false, nil, nil, nil}, :program)
-    #do: eval(program, %IntcodeParams{return_val: :program})
+  # def eval_intcode(program),
+  # do: eval_intcode(program, 0, [0], [], false, 0, {false, nil, nil, nil}, :program)
+  # do: eval(program, %IntcodeParams{return_val: :program})
 
   # Day 5
-  #def eval_intcode(program, idx, input, outputs),
-    #do: eval_intcode(program, idx, [input], outputs, false, 0, {false, nil, nil, nil}, :outputs)
+  # def eval_intcode(program, idx, input, outputs),
+  # do: eval_intcode(program, idx, [input], outputs, false, 0, {false, nil, nil, nil}, :outputs)
 
   # Day 7
   def eval_intcode(program, idx, inputs, outputs, loop_mode),

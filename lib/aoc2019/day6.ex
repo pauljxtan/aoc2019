@@ -33,7 +33,7 @@ defmodule Aoc2019.Day6 do
   def count_descendants(tree, parent, cache \\ %{}) do
     case cache |> Map.get(parent, nil) do
       nil ->
-        if parent not in Map.keys(tree)  do
+        if parent not in Map.keys(tree) do
           {0, cache}
         else
           count =
@@ -47,7 +47,9 @@ defmodule Aoc2019.Day6 do
 
           {count, cache |> Map.put(parent, count)}
         end
-      count -> {count, cache}
+
+      count ->
+        {count, cache}
     end
   end
 
