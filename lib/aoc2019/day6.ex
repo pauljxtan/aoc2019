@@ -40,7 +40,7 @@ defmodule Aoc2019.Day6 do
             tree
             |> Map.get(parent)
             |> Enum.map(fn child ->
-              {child_count, cache} = count_descendants(tree, child, cache)
+              {child_count, _cache} = count_descendants(tree, child, cache)
               1 + child_count
             end)
             |> Enum.sum()

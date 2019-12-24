@@ -2,7 +2,7 @@ defmodule Aoc2019Test do
   use ExUnit.Case
   doctest Aoc2019
 
-  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11}
+  alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11, Day12}
   alias Intcode
 
   test "day 1" do
@@ -106,17 +106,17 @@ defmodule Aoc2019Test do
            }
 
     assert tree |> Day6.count_descendants("COM") |> (fn {count, _cache} -> count end).() == 11
-    assert tree |> Day6.count_descendants("B")   |> (fn {count, _cache} -> count end).() == 10
-    assert tree |> Day6.count_descendants("G")   |> (fn {count, _cache} -> count end).() == 1
-    assert tree |> Day6.count_descendants("H")   |> (fn {count, _cache} -> count end).() == 0
-    assert tree |> Day6.count_descendants("C")   |> (fn {count, _cache} -> count end).() == 7
-    assert tree |> Day6.count_descendants("D")   |> (fn {count, _cache} -> count end).() == 6
-    assert tree |> Day6.count_descendants("I")   |> (fn {count, _cache} -> count end).() == 0
-    assert tree |> Day6.count_descendants("E")   |> (fn {count, _cache} -> count end).() == 4
-    assert tree |> Day6.count_descendants("J")   |> (fn {count, _cache} -> count end).() == 2
-    assert tree |> Day6.count_descendants("K")   |> (fn {count, _cache} -> count end).() == 1
-    assert tree |> Day6.count_descendants("L")   |> (fn {count, _cache} -> count end).() == 0
-    assert tree |> Day6.count_descendants("F")   |> (fn {count, _cache} -> count end).() == 0
+    assert tree |> Day6.count_descendants("B") |> (fn {count, _cache} -> count end).() == 10
+    assert tree |> Day6.count_descendants("G") |> (fn {count, _cache} -> count end).() == 1
+    assert tree |> Day6.count_descendants("H") |> (fn {count, _cache} -> count end).() == 0
+    assert tree |> Day6.count_descendants("C") |> (fn {count, _cache} -> count end).() == 7
+    assert tree |> Day6.count_descendants("D") |> (fn {count, _cache} -> count end).() == 6
+    assert tree |> Day6.count_descendants("I") |> (fn {count, _cache} -> count end).() == 0
+    assert tree |> Day6.count_descendants("E") |> (fn {count, _cache} -> count end).() == 4
+    assert tree |> Day6.count_descendants("J") |> (fn {count, _cache} -> count end).() == 2
+    assert tree |> Day6.count_descendants("K") |> (fn {count, _cache} -> count end).() == 1
+    assert tree |> Day6.count_descendants("L") |> (fn {count, _cache} -> count end).() == 0
+    assert tree |> Day6.count_descendants("F") |> (fn {count, _cache} -> count end).() == 0
 
     assert tree |> Day6.count_all_descendants() == 42
 
@@ -400,5 +400,56 @@ defmodule Aoc2019Test do
              ".#..#.#..#.#..#.#....#....#..#.#..#.#..#...",
              ".#..#.###...##..####.#.....##..#..#..##...."
            ]
+  end
+
+  test "day 12" do
+    positions = [{-1, 0, 2}, {2, -10, -7}, {4, -8, 8}, {3, 5, -1}]
+    velocities = [{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}]
+
+    assert Day12.iterate({positions, velocities}, 0) == {positions, velocities}
+
+    assert Day12.iterate({positions, velocities}, 1) ==
+             {[{2, -1, 1}, {3, -7, -4}, {1, -7, 5}, {2, 2, 0}],
+              [{3, -1, -1}, {1, 3, 3}, {-3, 1, -3}, {-1, -3, 1}]}
+
+    assert Day12.iterate({positions, velocities}, 2) ==
+             {[{5, -3, -1}, {1, -2, 2}, {1, -4, -1}, {1, -4, 2}],
+              [{3, -2, -2}, {-2, 5, 6}, {0, 3, -6}, {-1, -6, 2}]}
+
+    assert Day12.iterate({positions, velocities}, 3) ==
+             {[{5, -6, -1}, {0, 0, 6}, {2, 1, -5}, {1, -8, 2}],
+              [{0, -3, 0}, {-1, 2, 4}, {1, 5, -4}, {0, -4, 0}]}
+
+    assert Day12.iterate({positions, velocities}, 4) ==
+             {[{2, -8, 0}, {2, 1, 7}, {2, 3, -6}, {2, -9, 1}],
+              [{-3, -2, 1}, {2, 1, 1}, {0, 2, -1}, {1, -1, -1}]}
+
+    assert Day12.iterate({positions, velocities}, 5) ==
+             {[{-1, -9, 2}, {4, 1, 5}, {2, 2, -4}, {3, -7, -1}],
+              [{-3, -1, 2}, {2, 0, -2}, {0, -1, 2}, {1, 2, -2}]}
+
+    assert Day12.iterate({positions, velocities}, 6) ==
+             {[{-1, -7, 3}, {3, 0, 0}, {3, -2, 1}, {3, -4, -2}],
+              [{0, 2, 1}, {-1, -1, -5}, {1, -4, 5}, {0, 3, -1}]}
+
+    assert Day12.iterate({positions, velocities}, 7) ==
+             {[{2, -2, 1}, {1, -4, -4}, {3, -7, 5}, {2, 0, 0}],
+              [{3, 5, -2}, {-2, -4, -4}, {0, -5, 4}, {-1, 4, 2}]}
+
+    assert Day12.iterate({positions, velocities}, 8) ==
+             {[{5, 2, -2}, {2, -7, -5}, {0, -9, 6}, {1, 1, 3}],
+              [{3, 4, -3}, {1, -3, -1}, {-3, -2, 1}, {-1, 1, 3}]}
+
+    assert Day12.iterate({positions, velocities}, 9) ==
+             {[{5, 3, -4}, {2, -9, -3}, {0, -8, 4}, {1, 1, 5}],
+              [{0, 1, -2}, {0, -2, 2}, {0, 1, -2}, {0, 0, 2}]}
+
+    assert Day12.iterate({positions, velocities}, 10) ==
+             {[{2, 1, -3}, {1, -8, 0}, {3, -6, 1}, {2, 0, 4}],
+              [{-3, -2, 1}, {-1, 1, 3}, {3, 2, -3}, {1, -1, -1}]}
+
+    assert Day12.iterate({positions, velocities}, 10) |> Day12.total_energy() == 179
+
+    assert Day12.solve_part1() == 8625
   end
 end
