@@ -1,4 +1,6 @@
 defmodule Aoc2019.Day12 do
+  import Utils
+
   @behaviour DaySolution
 
   def solve_part1() do
@@ -7,7 +9,55 @@ defmodule Aoc2019.Day12 do
     {positions, velocities} |> iterate(1000) |> total_energy()
   end
 
-  def solve_part2(), do: :not_implemented
+  def solve_part2() do
+    positions = get_moons()
+    velocities = List.duplicate({0, 0, 0}, length(positions))
+    {positions, velocities} |> get_period
+  end
+
+  def iterate(moons, n_steps) when n_steps < 1, do: moons
+
+  def iterate(moons, n_steps), do: iterate(step(moons), n_steps - 1)
+
+  def total_energy({positions, velocities}),
+    do: positions |> Enum.zip(velocities) |> Enum.map(&energy/1) |> Enum.sum()
+
+  # Find period separately for each dimension, then find lowest common multiple
+  def get_period({positions, velocities}),
+    do:
+      [:x, :y, :z]
+      |> Enum.map(fn dimension -> {positions, velocities} |> get_period_dim(dimension) end)
+      |> lowest_common_multiple()
+
+  defp get_period_dim({positions_init, velocities_init}, dimension),
+    do:
+      Stream.iterate(1, fn step -> step + 1 end)
+      |> Enum.reduce_while({positions_init, velocities_init}, fn step, {positions, velocities} ->
+        {positions, velocities} = step({positions, velocities})
+
+        if {positions, velocities} |> extract_dimension(dimension) ==
+             {positions_init, velocities_init} |> extract_dimension(dimension),
+           do: {:halt, step},
+           else: {:cont, {positions, velocities}}
+      end)
+
+  defp extract_dimension({positions, velocities}, dimension) do
+    [positions, velocities]
+    |> Enum.map(fn posvels ->
+      posvels
+      |> Enum.map(fn posvel ->
+        posvel
+        |> Tuple.to_list()
+        |> Enum.at(
+          case dimension do
+            :x -> 0
+            :y -> 1
+            :z -> 2
+          end
+        )
+      end)
+    end)
+  end
 
   defp get_moons(),
     do:
@@ -26,13 +76,6 @@ defmodule Aoc2019.Day12 do
         |> Enum.map(fn {x, _} -> x end)
       end)
       |> Enum.map(&List.to_tuple/1)
-
-  def iterate(moons, n_steps) when n_steps < 1, do: moons
-
-  def iterate(moons, n_steps), do: iterate(step(moons), n_steps - 1)
-
-  def total_energy({positions, velocities}),
-    do: positions |> Enum.zip(velocities) |> Enum.map(&energy/1) |> Enum.sum()
 
   defp energy({position, velocity}),
     do:

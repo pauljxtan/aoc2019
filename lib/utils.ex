@@ -16,4 +16,12 @@ defmodule Utils do
 
   def permutations(xs),
     do: for(x <- xs, remaining <- permutations(xs -- [x]), do: [x | remaining])
+
+  def lowest_common_multiple(list), do: lcm(list)
+
+  defp lcm(a, b), do: abs(a * b) |> div(gcd(a, b))
+  defp lcm([x | [y]]), do: lcm(x, y)
+  defp lcm([x | xs]), do: lcm(x, lcm(xs))
+  defp gcd(a, 0), do: abs(a)
+  defp gcd(a, b), do: gcd(b, rem(a, b))
 end

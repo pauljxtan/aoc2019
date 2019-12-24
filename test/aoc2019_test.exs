@@ -4,6 +4,11 @@ defmodule Aoc2019Test do
 
   alias Aoc2019.{Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11, Day12}
   alias Intcode
+  alias Utils
+
+  test "utils" do
+    assert Utils.lowest_common_multiple([12, 34, 56]) == 2856
+  end
 
   test "day 1" do
     # Part 1 (non-recursive)
@@ -251,6 +256,7 @@ defmodule Aoc2019Test do
            |> Intcode.eval_intcode(0, 1, [], false, 0) == [1_125_899_906_842_624]
 
     assert Day9.solve_part1() == 3_989_758_265
+    # TODO optimize
     assert Day9.solve_part2() == 76791
   end
 
@@ -403,6 +409,8 @@ defmodule Aoc2019Test do
   end
 
   test "day 12" do
+    # Part 1
+
     positions = [{-1, 0, 2}, {2, -10, -7}, {4, -8, 8}, {3, 5, -1}]
     velocities = [{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}]
 
@@ -451,5 +459,14 @@ defmodule Aoc2019Test do
     assert Day12.iterate({positions, velocities}, 10) |> Day12.total_energy() == 179
 
     assert Day12.solve_part1() == 8625
+
+    # Part 2
+
+    assert Day12.get_period({positions, velocities}) == 2772
+
+    positions2 = [{-8, -10, 0}, {5, 5, 10}, {2, -7, 3}, {9, -8, -3}]
+    assert Day12.get_period({positions2, velocities}) == 4_686_774_924
+
+    assert Day12.solve_part2() == 332_477_126_821_644
   end
 end
