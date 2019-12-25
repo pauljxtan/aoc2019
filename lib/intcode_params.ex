@@ -6,7 +6,9 @@ defmodule IntcodeParams do
             rel_base: 0,
             return_val: :outputs,
             robot_mode: false,
-            robot_position: nil,
-            robot_direction: nil,
-            robot_panels: nil
+            robot_position: {0, 0},
+            robot_direction: :up,
+            robot_panels: %{},
+            arcade_mode: false,
+            arcade_tiles: %{}
 end

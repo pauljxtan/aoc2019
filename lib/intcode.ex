@@ -8,6 +8,11 @@ defmodule Intcode do
         do: do_robot_action(params),
         else: params
 
+    params =
+      if params.arcade_mode and length(params.outputs) == 3,
+        do: do_arcade_action(params),
+        else: params
+
     [opcode: opcode, mode1: mode1, mode2: mode2, mode3: mode3] =
       program
       |> Enum.at(params.idx)
@@ -44,6 +49,9 @@ defmodule Intcode do
         cond do
           params.robot_mode ->
             params.robot_panels
+
+          params.arcade_mode ->
+            params.arcade_tiles
 
           params.loop_mode ->
             :end
@@ -174,6 +182,26 @@ defmodule Intcode do
           end
         ],
         outputs: []
+    }
+  end
+
+  defp do_arcade_action(params) do
+    [x, y, tile_id] = params.outputs
+
+    %{
+      params
+      | outputs: [], arcade_tiles:
+          params.arcade_tiles
+          |> Map.put(
+            {x, y},
+            case tile_id do
+              0 -> :empty
+              1 -> :wall
+              2 -> :block
+              3 -> :horizontal_paddle
+              4 -> :ball
+            end
+          )
     }
   end
 end

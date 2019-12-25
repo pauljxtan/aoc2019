@@ -10,7 +10,6 @@ defmodule Aoc2019.Day11 do
     do:
       program
       |> Intcode.add_memory(10)
-      # WLOG, start at (0, 0)
       |> Intcode.eval(%IntcodeParams{
         inputs: [
           case init_colour do
@@ -18,10 +17,7 @@ defmodule Aoc2019.Day11 do
             :white -> 1
           end
         ],
-        robot_mode: true,
-        robot_position: {0, 0},
-        robot_direction: :up,
-        robot_panels: Map.new()
+        robot_mode: true
       })
 
   def format_str(panels) do
